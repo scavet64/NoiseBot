@@ -10,14 +10,15 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
     /// <summary>
     /// TODO: Make this an active object so there wont be multi threading issues
     /// </summary>
-    public class CustomCommandFile
+    public class CustomAudioCommandFile
     {
-        private static readonly string commandFilePath = "config.json";
-        private static CustomCommandFile instance;
+        private static readonly string commandFilePath = "CustomAudioCommands.json";
+        private static CustomAudioCommandFile instance;
 
-        public static CustomCommandFile Instance
+        public static CustomAudioCommandFile Instance
         {
-            get {
+            get
+            {
                 if (instance == null)
                 {
                     instance = LoadConfigFromFile(commandFilePath);
@@ -31,18 +32,23 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
         private List<CustomAudioCommandModel> customAudioCommands;
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="CustomCommandFile"/> class from being created.
+        /// Prevents a default instance of the <see cref="CustomAudioCommandFile"/> class from being created.
         /// </summary>
-        private CustomCommandFile() { }
+        private CustomAudioCommandFile()
+        {
+            customAudioCommands = new List<CustomAudioCommandModel>();
+        }
 
-        private static CustomCommandFile LoadConfigFromFile(string filePath)
+        private static CustomAudioCommandFile LoadConfigFromFile(string filePath)
         {
             if (!File.Exists(filePath))
             {
                 //create the file
+                instance = new CustomAudioCommandFile();
+                return instance;
             }
 
-            CustomCommandFile rVal;
+            CustomAudioCommandFile rVal;
 
             try
             {
@@ -51,7 +57,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
                     using (var sr = new StreamReader(fs, new UTF8Encoding(false)))
                     {
                         string json = sr.ReadToEnd();
-                        rVal = JsonConvert.DeserializeObject<CustomCommandFile>(json);
+                        rVal = JsonConvert.DeserializeObject<CustomAudioCommandFile>(json);
                     }
                 }
             }
@@ -69,9 +75,9 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
 
         public CustomAudioCommandModel GetAudioFileForCommand(string commandName)
         {
-            foreach(CustomAudioCommandModel command in customAudioCommands)
+            foreach (CustomAudioCommandModel command in customAudioCommands)
             {
-                if(string.Equals(command.CommandName.Equals(command), StringComparison.CurrentCultureIgnoreCase))
+                if (commandName.Equals(command.CommandName, StringComparison.InvariantCultureIgnoreCase))
                 {
                     return command;
                 }
@@ -89,6 +95,17 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
         public void AddCustomCommand(CustomAudioCommandModel commandToAdd)
         {
             customAudioCommands.Add(commandToAdd);
+            SaveFile();
+        }
+
+        private void SaveFile()
+        {
+            using (StreamWriter file = File.CreateText(commandFilePath))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(file, Instance);
+            }
+
         }
 
     }

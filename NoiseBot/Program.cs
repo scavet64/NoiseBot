@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using NoiseBot.Exceptions;
 using NoiseBot.Commands.VoiceCommands;
 using NoiseBot.Commands.VoiceCommands.VoiceRecognition;
+using NoiseBot.Commands.VoiceCommands.CustomVoiceCommands;
 
 namespace NoiseBot
 {
@@ -127,6 +128,7 @@ namespace NoiseBot
             this.Commands.RegisterCommands<WormsCommand>();
             this.Commands.RegisterCommands<VoiceRecognition>();
             this.Commands.RegisterCommands<FuckYouCommand>();
+            this.Commands.RegisterCommands<CustomAudioCommand>();
 
             // let's set up voice
             var vcfg = new VoiceNextConfiguration
