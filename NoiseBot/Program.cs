@@ -124,6 +124,7 @@ namespace NoiseBot
             // up next, let's register our commands
             this.Commands.RegisterCommands<VoiceCommand>();
             this.Commands.RegisterCommands<PlayAudioCommand>();
+            this.Commands.RegisterCommands<WormsCommand>();
 
             // let's set up voice
             var vcfg = new VoiceNextConfiguration
