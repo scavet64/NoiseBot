@@ -11,6 +11,8 @@ using DSharpPlus.VoiceNext;
 using DSharpPlus.VoiceNext.Codec;
 using Newtonsoft.Json;
 using NoiseBot.Exceptions;
+using NoiseBot.Commands.VoiceCommands;
+using NoiseBot.Commands.VoiceCommands.VoiceRecognition;
 
 namespace NoiseBot
 {
@@ -120,12 +122,14 @@ namespace NoiseBot
             this.Commands.CommandErrored += this.Commands_CommandErrored;
 
             // up next, let's register our commands
-            //this.Commands.RegisterCommands<ExampleVoiceCommands>();
+            this.Commands.RegisterCommands<VoiceCommand>();
+            this.Commands.RegisterCommands<PlayAudioCommand>();
 
             // let's set up voice
             var vcfg = new VoiceNextConfiguration
             {
-                VoiceApplication = VoiceApplication.Music
+                VoiceApplication = VoiceApplication.Music,
+                EnableIncoming = true
             };
 
             // and let's enable it
