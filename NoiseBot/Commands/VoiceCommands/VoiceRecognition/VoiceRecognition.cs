@@ -79,7 +79,8 @@ namespace NoiseBot.Commands.VoiceCommands.VoiceRecognition
         [Command("StartListen"), Description("Start voice recognition")]
         public async Task StartListen(CommandContext ctx)
         {
-            VoiceNextClient voiceNextClient = await JoinIfNotConnected(ctx);
+            await JoinIfNotConnected(ctx);
+            VoiceNextClient voiceNextClient = ctx.Client.GetVoiceNextClient();
             VoiceNextConnection voiceNextCon = voiceNextClient.GetConnection(ctx.Guild);
             if (voiceNextClient.IsIncomingEnabled)
             {

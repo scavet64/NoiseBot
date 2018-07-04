@@ -15,8 +15,8 @@ namespace NoiseBot.Commands.VoiceCommands
         public async Task Play(CommandContext ctx, [RemainingText, Description("Full path to the file to play.")] string filename)
         {
             // check whether VNext is enabled
-            VoiceNextClient voiceNextClient = await JoinIfNotConnected(ctx);
-            VoiceNextConnection voiceNextCon = voiceNextClient.GetConnection(ctx.Guild);
+            await JoinIfNotConnected(ctx);
+            VoiceNextConnection voiceNextCon = ctx.Client.GetVoiceNextClient().GetConnection(ctx.Guild);
             if (voiceNextCon == null)
             {
                 // already connected

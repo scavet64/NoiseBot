@@ -115,7 +115,7 @@ namespace NoiseBot.Commands.VoiceCommands
             }
         }
 
-        public async Task<VoiceNextClient> JoinIfNotConnected(CommandContext context)
+        public async Task JoinIfNotConnected(CommandContext context)
         {
             //Check connection
             if (!await IsClientConnected(context))
@@ -123,7 +123,6 @@ namespace NoiseBot.Commands.VoiceCommands
                 //not connected, so join
                 await Join(context);
             }
-            return context.Client.GetVoiceNextClient();
         }
     }
 }
