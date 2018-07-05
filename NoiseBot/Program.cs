@@ -38,7 +38,7 @@ namespace NoiseBot
             // first, let's load our configuration file
             try
             {
-                configFile = ConfigFile.GetConfig();
+                configFile = ConfigFile.Instance;
             }
             catch (InvalidConfigException ice)
             {
@@ -129,6 +129,7 @@ namespace NoiseBot
             this.Commands.RegisterCommands<VoiceRecognition>();
             this.Commands.RegisterCommands<FuckYouCommand>();
             this.Commands.RegisterCommands<CustomAudioCommand>();
+            this.Commands.RegisterCommands<MadWorldCommand>();
 
             // let's set up voice
             var vcfg = new VoiceNextConfiguration
