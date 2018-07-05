@@ -10,7 +10,22 @@ namespace NoiseBot
     class ConfigFile
     {
         private static readonly string configFilePath = "config.json";
-        private static ConfigFile configFile;
+
+        private static ConfigFile instance;
+
+        public static ConfigFile Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = LoadConfigFromFile(configFilePath);
+                }
+                return instance;
+            }
+            set { instance = value; }
+        }
+
 
         [JsonProperty("token")]
         public string Token { get; private set; }
@@ -19,15 +34,6 @@ namespace NoiseBot
         public string CommandPrefix { get; private set; }
 
         private ConfigFile() { }
-
-        public static ConfigFile GetConfig()
-        {
-            if (configFile == null)
-            {
-                configFile = LoadConfigFromFile(configFilePath);
-            }
-            return configFile;
-        }
 
         private static ConfigFile LoadConfigFromFile(string filePath)
         {

@@ -108,5 +108,15 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
 
         }
 
+        public List<string> GetAllCustomCommandNames()
+        {
+            List<string> commandNames = new List<string>();
+            foreach(CustomAudioCommandModel command in customAudioCommands)
+            {
+                commandNames.Add(command.CommandName);
+            }
+            return commandNames;
+        }
+
     }
 }

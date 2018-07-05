@@ -7,12 +7,13 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.VoiceNext;
 using System.Net;
+using System.Collections.Generic;
 
 namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
 {
     class CustomAudioCommand : PlayAudioCommand
     {
-        [Command("Custom"), Description("Plays an audio file.")]
+        [Command("."), Description("Plays a custom audio command.")]
         public async Task PlayCustom(CommandContext ctx, [RemainingText, Description("Name of the command")] string customCommandName)
         {
             CustomAudioCommandModel custCom = CustomAudioCommandFile.Instance.GetAudioFileForCommand(customCommandName);
@@ -27,7 +28,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
             await Play(ctx, custCom.Filepath);
         }
 
-        [Command("CustomAdd"), Description("Adds a custom audio file.")]
+        [Command("CustomAdd"), Description("Adds a custom audio command.")]
         public async Task AddCustom(CommandContext ctx, [RemainingText, Description("Name of the command")] string customCommandName)
         {
             if (ctx.Message.Attachments.Count <= 0)
@@ -59,6 +60,27 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
 
             CustomAudioCommandFile.Instance.AddCustomCommand(customCommandName, customAudioPath);
             await ctx.RespondAsync(string.Format("Custom command ```{0}``` was added :^)", customCommandName));
+        }
+
+        [Command("CustomList"), Description("Get a list of all custom commands")]
+        public async Task ListCustom(CommandContext ctx, [RemainingText, Description("Name of the command")] string customCommandName)
+        {
+            List<string> custCom = CustomAudioCommandFile.Instance.GetAllCustomCommandNames();
+            string content = "";
+            foreach (string name in custCom)
+            {
+                content += name + "\n";
+            }
+
+            var embed = new DiscordEmbedBuilder
+            {
+                Color = new DiscordColor(0x5349fe),
+                Title = "List of custom commands:",
+                Description = string.Format("To use a custom command use `{0}. ` followed by the desired command", ConfigFile.Instance.CommandPrefix)
+            };
+
+            embed.AddField("Custom Commands:", content);
+            await ctx.RespondAsync(embed: embed);
         }
     }
 }
