@@ -80,7 +80,7 @@ namespace NoiseBot.Commands.VoiceCommands.VoiceRecognition
         public async Task StartListen(CommandContext ctx)
         {
             await JoinIfNotConnected(ctx);
-            VoiceNextClient voiceNextClient = ctx.Client.GetVoiceNextClient();
+            VoiceNextExtension voiceNextClient = ctx.Client.GetVoiceNext();
             VoiceNextConnection voiceNextCon = voiceNextClient.GetConnection(ctx.Guild);
             if (voiceNextClient.IsIncomingEnabled)
             {
@@ -96,8 +96,8 @@ namespace NoiseBot.Commands.VoiceCommands.VoiceRecognition
         {
             if (await IsClientConnected(ctx))
             {
-                VoiceNextClient voiceNextClient = ctx.Client.GetVoiceNextClient();
-                VoiceNextConnection voiceNextCon = ctx.Client.GetVoiceNextClient().GetConnection(ctx.Guild);
+                VoiceNextExtension voiceNextClient = ctx.Client.GetVoiceNext();
+                VoiceNextConnection voiceNextCon = ctx.Client.GetVoiceNext().GetConnection(ctx.Guild);
                 if (voiceNextClient.IsIncomingEnabled)
                 {
                     this._ssrc_map = new ConcurrentDictionary<uint, ulong>();

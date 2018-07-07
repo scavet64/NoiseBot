@@ -16,7 +16,7 @@ namespace NoiseBot.Commands.VoiceCommands
         {
             // check whether VNext is enabled
             await JoinIfNotConnected(ctx);
-            VoiceNextConnection voiceNextCon = ctx.Client.GetVoiceNextClient().GetConnection(ctx.Guild);
+            VoiceNextConnection voiceNextCon = ctx.Client.GetVoiceNext().GetConnection(ctx.Guild);
             if (voiceNextCon == null)
             {
                 // already connected

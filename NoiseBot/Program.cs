@@ -14,14 +14,16 @@ using NoiseBot.Exceptions;
 using NoiseBot.Commands.VoiceCommands;
 using NoiseBot.Commands.VoiceCommands.VoiceRecognition;
 using NoiseBot.Commands.VoiceCommands.CustomVoiceCommands;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace NoiseBot
 {
     class Program
     {
         public DiscordClient Client { get; set; }
-        public CommandsNextModule Commands { get; set; }
-        public VoiceNextClient Voice { get; set; }
+        public CommandsNextExtension Commands { get; set; }
+        public VoiceNextExtension Voice { get; set; }
 
         private ConfigFile configFile;
 
@@ -105,7 +107,7 @@ namespace NoiseBot
             var ccfg = new CommandsNextConfiguration
             {
                 // let's use the string prefix defined in config.json
-                StringPrefix = configFile.CommandPrefix,
+                StringPrefixes = new[] { configFile.CommandPrefix },
 
                 // enable responding in direct messages
                 EnableDms = true,

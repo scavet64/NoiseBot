@@ -17,7 +17,7 @@ namespace NoiseBot.Commands.VoiceCommands
     /// <summary>
     /// Base class for any voice commands. Holds basic functionality for anything relating to a voice command such as joining
     /// </summary>
-    class VoiceCommand
+    class VoiceCommand : BaseCommandModule
     {
         [Command("join"), Description("Joins a voice channel.")]
         public async Task Join(CommandContext context, DiscordChannel chn = null)
@@ -47,7 +47,7 @@ namespace NoiseBot.Commands.VoiceCommands
             // connect
             try
             {
-                var vnc = await context.Client.GetVoiceNextClient().ConnectAsync(chn);
+                var vnc = await context.Client.GetVoiceNext().ConnectAsync(chn);
                 await context.RespondAsync($"Connected to `{chn.Name}`");
             }
             catch (DllNotFoundException dllNF)
@@ -62,7 +62,7 @@ namespace NoiseBot.Commands.VoiceCommands
         public async Task Leave(CommandContext context)
         {
             // check whether VNext is enabled
-            var vnext = context.Client.GetVoiceNextClient();
+            var vnext = context.Client.GetVoiceNext();
             if (vnext == null)
             {
                 // not enabled
@@ -95,7 +95,7 @@ namespace NoiseBot.Commands.VoiceCommands
         /// <returns>true if connected</returns>
         public async Task<bool> IsClientConnected(CommandContext context)
         {
-            var vnext = context.Client.GetVoiceNextClient();
+            var vnext = context.Client.GetVoiceNext();
             if (vnext == null)
             {
                 // not enabled
