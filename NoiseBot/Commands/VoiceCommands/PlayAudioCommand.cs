@@ -42,6 +42,7 @@ namespace NoiseBot.Commands.VoiceCommands
             try
             {
                 await PlayAudio(voiceNextCon, filename);
+                voiceNextCon.Disconnect();
             }
             catch (Exception ex)
             {
