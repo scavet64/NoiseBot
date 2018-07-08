@@ -39,6 +39,18 @@ namespace NoiseBot.Commands.VoiceCommands
                 return;
             }
 
+            try
+            {
+                await PlayAudio(voiceNextCon, filename);
+            }
+            catch (Exception ex)
+            {
+                await ctx.RespondAsync($"An exception occured during playback: `{ex.GetType()}: {ex.Message}`");
+            }
+        }
+
+        public async static Task PlayAudio(VoiceNextConnection voiceNextCon, string filename)
+        {
             // wait for current playback to finish
             while (voiceNextCon.IsPlaying)
             {
@@ -87,7 +99,7 @@ namespace NoiseBot.Commands.VoiceCommands
             }
             catch (Exception ex)
             {
-                await ctx.RespondAsync($"An exception occured during playback: `{ex.GetType()}: {ex.Message}`");
+                throw ex;
             }
             finally
             {

@@ -8,6 +8,7 @@ using DSharpPlus.Entities;
 using DSharpPlus.VoiceNext;
 using System.Net;
 using System.Collections.Generic;
+using NoiseBot.Commands.CommandUtil;
 
 namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
 {
@@ -31,12 +32,6 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
         [Command("CustomAdd"), Description("Adds a custom audio command.")]
         public async Task AddCustom(CommandContext ctx, [RemainingText, Description("Name of the command")] string customCommandName)
         {
-            if (ctx.Message.Attachments.Count <= 0)
-            {
-                await ctx.RespondAsync("No file was attached to the message :^(");
-                return;
-            }
-
             CustomAudioCommandModel custCom = CustomAudioCommandFile.Instance.GetAudioFileForCommand(customCommandName);
             if (custCom != null)
             {
@@ -44,22 +39,14 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
                 return;
             }
 
-            DiscordAttachment attachment = ctx.Message.Attachments[0];
-            string customAudioPath = string.Format(@"AudioFiles\{0}", attachment.FileName);
-
-            if (File.Exists(customAudioPath))
+            if (await FileDownloadUtil.DownloadFileFromDiscordMessageAsync(ctx))
             {
-                await ctx.RespondAsync("A command with that filename already exists :^(");
-                return;
-            }
+                DiscordAttachment attachment = ctx.Message.Attachments[0];
+                string customAudioPath = string.Format(@"AudioFiles\{0}", attachment.FileName);
 
-            using (var client = new WebClient())
-            {
-                client.DownloadFile(attachment.Url, customAudioPath);
+                CustomAudioCommandFile.Instance.AddCustomCommand(customCommandName, customAudioPath);
+                await ctx.RespondAsync(string.Format("Custom command ```{0}``` was added :^)", customCommandName));
             }
-
-            CustomAudioCommandFile.Instance.AddCustomCommand(customCommandName, customAudioPath);
-            await ctx.RespondAsync(string.Format("Custom command ```{0}``` was added :^)", customCommandName));
         }
 
         [Command("CustomList"), Description("Get a list of all custom commands")]

@@ -16,6 +16,7 @@ using NoiseBot.Commands.VoiceCommands.VoiceRecognition;
 using NoiseBot.Commands.VoiceCommands.CustomVoiceCommands;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using NoiseBot.Commands.VoiceCommands.CustomIntroCommands;
 
 namespace NoiseBot
 {
@@ -132,6 +133,8 @@ namespace NoiseBot
             this.Commands.RegisterCommands<FuckYouCommand>();
             this.Commands.RegisterCommands<CustomAudioCommand>();
             this.Commands.RegisterCommands<MadWorldCommand>();
+            this.Commands.RegisterCommands<CustomIntroCommand>();
+            //this.Client.TypingStarted += Client_TypingStarted;
 
             // let's set up voice
             var vcfg = new VoiceNextConfiguration
@@ -151,6 +154,13 @@ namespace NoiseBot
 
             // and this is to prevent premature quitting
             await Task.Delay(-1);
+        }
+
+        private Task Client_TypingStarted(TypingStartEventArgs e)
+        {
+            e.Channel.SendMessageAsync(":^)");
+
+            return Task.CompletedTask;
         }
 
         private Task Client_Ready(ReadyEventArgs e)

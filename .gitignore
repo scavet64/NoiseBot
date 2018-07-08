@@ -261,3 +261,9 @@ __pycache__/
 *.pyc
 /NoiseBot/config.json
 *.pcm
+
+NoiseBot/AudioFiles/
+
+NoiseBot/CustomAudioCommands\.json
+
+NoiseBot/CustomIntros\.json
