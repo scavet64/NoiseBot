@@ -22,7 +22,7 @@ namespace NoiseBot
 {
     class Program
     {
-        public DiscordClient Client { get; set; }
+        public static DiscordClient Client { get; set; }
         public CommandsNextExtension Commands { get; set; }
         public VoiceNextExtension Voice { get; set; }
 
@@ -54,7 +54,7 @@ namespace NoiseBot
                 TokenType = TokenType.Bot,
 
                 AutoReconnect = true,
-                LogLevel = LogLevel.Debug,
+                LogLevel = LogLevel.Info,
                 UseInternalLogHandler = true
             };
 
@@ -67,7 +67,7 @@ namespace NoiseBot
             {
                 // load settings then we want to instantiate our client
                 DiscordConfiguration discordConfiguration = GetConfigFromJsonSettings();
-                this.Client = new DiscordClient(discordConfiguration);
+                Client = new DiscordClient(discordConfiguration);
             }
             catch (InvalidConfigException ice)
             {
@@ -100,9 +100,9 @@ namespace NoiseBot
 
             // next, let's hook some events, so we know
             // what's going on
-            this.Client.Ready += this.Client_Ready;
-            this.Client.GuildAvailable += this.Client_GuildAvailable;
-            this.Client.ClientErrored += this.Client_ClientError;
+            Client.Ready += this.Client_Ready;
+            Client.GuildAvailable += this.Client_GuildAvailable;
+            Client.ClientErrored += this.Client_ClientError;
 
             // up next, let's set up our commands
             var ccfg = new CommandsNextConfiguration
@@ -118,7 +118,7 @@ namespace NoiseBot
             };
 
             // and hook them up
-            this.Commands = this.Client.UseCommandsNext(ccfg);
+            this.Commands = Client.UseCommandsNext(ccfg);
 
             // let's hook some command events, so we know what's 
             // going on
@@ -140,14 +140,14 @@ namespace NoiseBot
             var vcfg = new VoiceNextConfiguration
             {
                 VoiceApplication = VoiceApplication.Music,
-                EnableIncoming = true
+                EnableIncoming = false
             };
 
             // and let's enable it
-            this.Voice = this.Client.UseVoiceNext(vcfg);
+            this.Voice = Client.UseVoiceNext(vcfg);
 
             // finally, let's connect and log in
-            await this.Client.ConnectAsync();
+            await Client.ConnectAsync();
 
             // for this example you will need to read the 
             // VoiceNext setup guide, and include ffmpeg.

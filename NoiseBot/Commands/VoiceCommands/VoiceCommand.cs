@@ -11,6 +11,7 @@ using DSharpPlus.EventArgs;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Timers;
+using NoiseBot.Extensions;
 
 namespace NoiseBot.Commands.VoiceCommands
 {
@@ -48,7 +49,8 @@ namespace NoiseBot.Commands.VoiceCommands
             try
             {
                 var vnc = await context.Client.GetVoiceNext().ConnectAsync(chn);
-                await context.RespondAsync($"Connected to `{chn.Name}`");
+                context.Client.DebugLogger.Info($"Connected to `{chn.Name}`");
+                //await context.RespondAsync($"Connected to `{chn.Name}`");
             }
             catch (DllNotFoundException dllNF)
             {

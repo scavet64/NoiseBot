@@ -27,9 +27,25 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
     {
         private List<DiscordUser> users = new List<DiscordUser>();
         private bool IsDoingIntros  = false;
-        private AutoResetEvent NewUserJoinedWaitHandle = new AutoResetEvent(false);
-        private DiscordUser newUser;
-        private DiscordChannel discordChannel;
+        //private AutoResetEvent NewUserJoinedWaitHandle = new AutoResetEvent(false);
+
+        BlockingCollection<IntroQueueElement> introQueue = new BlockingCollection<IntroQueueElement>();
+
+        private class IntroQueueElement
+        {
+            public DiscordUser NewUser { get; set; }
+            public DiscordChannel ChannelToJoin { get; set; }
+            public DiscordGuild GuildToJoin { get; set; }
+        }
+
+        public CustomIntroCommand()
+        {
+            Program.Client.VoiceStateUpdated += Client_VoiceStateUpdated;
+            IsDoingIntros = true;
+
+            var t = new Thread(() => IntroMethodThread());
+            t.Start();
+        }
 
         private async Task Client_VoiceStateUpdated(VoiceStateUpdateEventArgs e)
         {
@@ -42,12 +58,19 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
             {
                 lock (users)
                 {
-                    if (e.After.Channel != null && e.Before.Channel == null)
+                    if (e.After.Channel != null && (e.Before == null || e.Before.Channel == null))
                     {
-                        newUser = e.User;
-                        discordChannel = e.After.Channel;
-                        e.Client.DebugLogger.LogMessage(LogLevel.Debug, "NoiseBot", string.Format("{0} joined channel {1}", newUser, discordChannel.Name), DateTime.Now);
-                        NewUserJoinedWaitHandle.Set();
+                        IntroQueueElement introQueueElement = new IntroQueueElement
+                        {
+                            NewUser = e.User,
+                            ChannelToJoin = e.After.Channel,
+                            GuildToJoin = e.After.Guild
+                        };
+
+                        introQueue.Add(introQueueElement);
+
+                        e.Client.DebugLogger.LogMessage(LogLevel.Debug, "NoiseBot", string.Format("{0} joined channel {1}", e.User, e.After.Channel.Name), DateTime.Now);
+                        //NewUserJoinedWaitHandle.Set();
                     }
                     else if (e.After.Channel == null && e.Before.Channel != null)
                     {
@@ -72,7 +95,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
 
                 await ctx.RespondAsync("I will now introduce people as they join voice chat");
                 //await JoinIfNotConnected(ctx);
-                var t = new Thread(() => IntroMethodThread(ctx));
+                var t = new Thread(() => IntroMethodThread());
                 t.Start();
             } 
             else
@@ -95,34 +118,36 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
             return Task.CompletedTask;
         }
 
-        private async void IntroMethodThread(CommandContext ctx)
+        private async void IntroMethodThread()
         {
             while (IsDoingIntros)
             {
-                NewUserJoinedWaitHandle.WaitOne();
+                IntroQueueElement introQueueElement = introQueue.Take();
+                //NewUserJoinedWaitHandle.WaitOne();
                 if (IsDoingIntros)
                 {
-                    VoiceNextExtension voiceNextClient = ctx.Client.GetVoiceNext();
-                    VoiceNextConnection voiceNextCon = voiceNextClient.GetConnection(ctx.Guild);
+                    VoiceNextExtension voiceNextClient = Program.Client.GetVoiceNext();
+                    VoiceNextConnection voiceNextCon = voiceNextClient.GetConnection(introQueueElement.GuildToJoin);
                     if (voiceNextCon == null)
                     {
-                        voiceNextCon = await voiceNextClient.ConnectAsync(discordChannel);
+                        voiceNextCon = await voiceNextClient.ConnectAsync(introQueueElement.ChannelToJoin);
                     }
 
-                    CustomIntroModel introModel = CustomIntroFile.Instance.GetIntroForUsername(newUser.Username);
+                    CustomIntroModel introModel = CustomIntroFile.Instance.GetIntroForUsername(introQueueElement.NewUser.Username);
                     string filepath;
                     if (introModel != null)
                     {
+                        Program.Client.DebugLogger.Warn(string.Format("Playing {0} for {1}", introModel.Filepath, introQueueElement.NewUser.Username));
                         filepath = introModel.Filepath;
                     }
                     else
                     {
-                        ctx.Client.DebugLogger.Warn(string.Format("No intro was found for {0}. Using default", newUser.Username));
+                        Program.Client.DebugLogger.Warn(string.Format("No intro was found for {0}. Using default", introQueueElement.NewUser.Username));
                         filepath = @"AudioFiles\fuckyou.mp3";
                     }
-
-                    await Play(ctx, filepath);
-                    ctx.Client.GetVoiceNext().GetConnection(ctx.Guild).Disconnect();
+                    var vnc = Program.Client.GetVoiceNext().GetConnection(introQueueElement.GuildToJoin);
+                    await PlayAudio(vnc, filepath);
+                    vnc.Disconnect();
                 }
             }
         }
