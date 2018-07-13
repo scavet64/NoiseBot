@@ -56,7 +56,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
             string content = "";
             foreach (string name in custCom)
             {
-                content += name + "\n";
+                content += ConfigFile.Instance.CommandPrefix + ". " + name + "\n";
             }
 
             var embed = new DiscordEmbedBuilder
