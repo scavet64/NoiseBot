@@ -3,6 +3,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.VoiceNext;
 using NoiseBot.Commands.VoiceCommands;
+using NoiseBot.Extensions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -23,12 +24,8 @@ namespace NoiseBot.Controllers
         private class PlayQueueElement
         {
             public string Filepath { get; set; }
-            public CommandContext Context { get; set; }
-            public PlayQueueElement(string filepath, CommandContext context)
-            {
-                Filepath = filepath;
-                Context = context;
-            }
+            public DiscordChannel ChannelToJoin { get; set; }
+            public DiscordGuild GuildToJoin { get; set; }
         }
 
         private static AudioController instance;
@@ -57,9 +54,18 @@ namespace NoiseBot.Controllers
             t.Start();
         }
 
-        public void AddAudioToQueue(string filepath, CommandContext context)
+        public int AddAudioToQueue(string filepath, DiscordChannel ChannelToJoin, DiscordGuild GuildToJoin)
         {
-            playQueue.Add(new PlayQueueElement(filepath, context));
+            PlayQueueElement playQueueElement = new PlayQueueElement
+            {
+                Filepath = filepath,
+                ChannelToJoin = ChannelToJoin,
+                GuildToJoin = GuildToJoin
+            };
+            playQueue.Add(playQueueElement);
+            Program.Client.DebugLogger.Info(string.Format("Added playing file [{0}] to the queue", filepath));
+
+            return playQueue.Count;
         }
 
         private async void AudioPlayingThread()
@@ -68,8 +74,19 @@ namespace NoiseBot.Controllers
             {
                 PlayQueueElement elementToPlay = playQueue.Take();
 
+                //Connect if not already
+                VoiceNextExtension voiceNextClient = Program.Client.GetVoiceNext();
+                VoiceNextConnection voiceNextCon = voiceNextClient.GetConnection(elementToPlay.GuildToJoin);
+                if (voiceNextCon == null)
+                {
+                    voiceNextCon = await voiceNextClient.ConnectAsync(elementToPlay.ChannelToJoin);
+                }
 
-                await PlayCommandAudio(elementToPlay.Context, elementToPlay.Filepath);
+                await PlayAudio(voiceNextCon, elementToPlay.Filepath);
+                if (playQueue.Count == 0)
+                {
+                    voiceNextCon.Disconnect();
+                }
             }
         }
 
@@ -88,21 +105,6 @@ namespace NoiseBot.Controllers
             {
                 // already connected
                 await ctx.RespondAsync("Not connected in this guild.");
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(filename))
-            {
-                // file does not exist
-                await ctx.RespondAsync($"Specify the file you want to play");
-                return;
-            }
-
-            // check if file exists
-            if (!File.Exists(filename))
-            {
-                // file does not exist
-                await ctx.RespondAsync($"File `{filename}` does not exist.");
                 return;
             }
 

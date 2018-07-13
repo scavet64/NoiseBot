@@ -9,6 +9,7 @@ using DSharpPlus.VoiceNext;
 using System.Net;
 using System.Collections.Generic;
 using NoiseBot.Commands.CommandUtil;
+using NoiseBot.Extensions;
 
 namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
 {
@@ -26,6 +27,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
                 return;
             }
 
+            ctx.Client.DebugLogger.Info(string.Format("{0} executed custom command: {1}", ctx.User.Username, customCommandName));
             await Play(ctx, custCom.Filepath);
         }
 

@@ -126,13 +126,6 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
                 //NewUserJoinedWaitHandle.WaitOne();
                 if (IsDoingIntros)
                 {
-                    VoiceNextExtension voiceNextClient = Program.Client.GetVoiceNext();
-                    VoiceNextConnection voiceNextCon = voiceNextClient.GetConnection(introQueueElement.GuildToJoin);
-                    if (voiceNextCon == null)
-                    {
-                        voiceNextCon = await voiceNextClient.ConnectAsync(introQueueElement.ChannelToJoin);
-                    }
-
                     CustomIntroModel introModel = CustomIntroFile.Instance.GetIntroForUsername(introQueueElement.NewUser.Username);
                     string filepath;
                     if (introModel != null)
@@ -145,9 +138,8 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
                         Program.Client.DebugLogger.Warn(string.Format("No intro was found for {0}. Using default", introQueueElement.NewUser.Username));
                         filepath = @"AudioFiles\fuckyou.mp3";
                     }
-                    var vnc = Program.Client.GetVoiceNext().GetConnection(introQueueElement.GuildToJoin);
-                    await AudioController.PlayAudio(vnc, filepath); //TODO: Make this use the play audio queue
-                    vnc.Disconnect();
+
+                    AudioController.Instance.AddAudioToQueue(filepath, introQueueElement.ChannelToJoin, introQueueElement.GuildToJoin);
                 }
             }
         }

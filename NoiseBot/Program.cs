@@ -17,6 +17,7 @@ using NoiseBot.Commands.VoiceCommands.CustomVoiceCommands;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using NoiseBot.Commands.VoiceCommands.CustomIntroCommands;
+using NoiseBot.Extensions;
 
 namespace NoiseBot
 {
@@ -167,7 +168,7 @@ namespace NoiseBot
         private Task Client_Ready(ReadyEventArgs e)
         {
             // let's log the fact that this event occured
-            e.Client.DebugLogger.LogMessage(LogLevel.Info, "ExampleBot", "Client is ready to process events.", DateTime.Now);
+            e.Client.DebugLogger.Info("Client is ready to process events.");
 
             // since this method is not async, let's return
             // a completed task, so that no additional work
@@ -179,7 +180,7 @@ namespace NoiseBot
         {
             // let's log the name of the guild that was just
             // sent to our client
-            e.Client.DebugLogger.LogMessage(LogLevel.Info, "ExampleBot", $"Guild available: {e.Guild.Name}", DateTime.Now);
+            e.Client.DebugLogger.Info($"Guild available: {e.Guild.Name}");
 
             // since this method is not async, let's return
             // a completed task, so that no additional work
@@ -191,7 +192,7 @@ namespace NoiseBot
         {
             // let's log the details of the error that just 
             // occured in our client
-            e.Client.DebugLogger.LogMessage(LogLevel.Error, "ExampleBot", $"Exception occured: {e.Exception.GetType()}: {e.Exception.Message}", DateTime.Now);
+            e.Client.DebugLogger.Error($"Exception occured: {e.Exception.GetType()}: {e.Exception.Message}");
 
             // since this method is not async, let's return
             // a completed task, so that no additional work
@@ -202,7 +203,7 @@ namespace NoiseBot
         private Task Commands_CommandExecuted(CommandExecutionEventArgs e)
         {
             // let's log the name of the command and user
-            e.Context.Client.DebugLogger.LogMessage(LogLevel.Info, "ExampleBot", $"{e.Context.User.Username} successfully executed '{e.Command.QualifiedName}'", DateTime.Now);
+            e.Context.Client.DebugLogger.Info($"{e.Context.User.Username} successfully executed '{e.Command.QualifiedName}'");
 
             // since this method is not async, let's return
             // a completed task, so that no additional work
@@ -213,7 +214,7 @@ namespace NoiseBot
         private async Task Commands_CommandErrored(CommandErrorEventArgs e)
         {
             // let's log the error details
-            e.Context.Client.DebugLogger.LogMessage(LogLevel.Error, "ExampleBot", $"{e.Context.User.Username} tried executing '{e.Command?.QualifiedName ?? "<unknown command>"}' but it errored: {e.Exception.GetType()}: {e.Exception.Message ?? "<no message>"}", DateTime.Now);
+            e.Context.Client.DebugLogger.Error($"{e.Context.User.Username} tried executing '{e.Command?.QualifiedName ?? "<unknown command>"}' but it errored: {e.Exception.GetType()}: {e.Exception.Message ?? "<no message>"}");
 
             // let's check if the error is a result of lack
             // of required permissions
