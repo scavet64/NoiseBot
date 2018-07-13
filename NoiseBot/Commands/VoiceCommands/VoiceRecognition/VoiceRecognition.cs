@@ -1,37 +1,43 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
-using DSharpPlus.CommandsNext;
+﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.VoiceNext;
-using DSharpPlus;
 using DSharpPlus.EventArgs;
+using DSharpPlus.VoiceNext;
 using System.Collections.Concurrent;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace NoiseBot.Commands.VoiceCommands.VoiceRecognition
 {
     class VoiceRecognition : VoiceCommand
     {
-        private ConcurrentDictionary<uint, ulong> _ssrc_map;
-        private ConcurrentDictionary<uint, FileStream> _ssrc_filemap;
+        private ConcurrentDictionary<uint, ulong> ssrcMap;
+        private ConcurrentDictionary<uint, FileStream> ssrcFilemap;
         private Timer speakingSentence;
 
-        private async Task OnVoiceReceived(VoiceReceiveEventArgs e)
+        private static void OnTimedEvent(object source, System.Timers.ElapsedEventArgs e, FileStream fs)
+        {
+            fs.Close();
+            if (source is Timer timer)
+            {
+                timer.Stop();
+                timer.Dispose();
+            }
+        }
+
+        private Task OnVoiceReceived(VoiceReceiveEventArgs e)
         {
             lock (this)
             {
                 FileStream fs;
-                if (!this._ssrc_filemap.ContainsKey(e.SSRC))
+                if (!this.ssrcFilemap.ContainsKey(e.SSRC))
                 {
                     fs = File.Create($"{e.SSRC}.pcm");
-                    this._ssrc_filemap[e.SSRC] = fs;
+                    this.ssrcFilemap[e.SSRC] = fs;
                 }
 
-                fs = this._ssrc_filemap[e.SSRC];
+                fs = this.ssrcFilemap[e.SSRC];
 
                 if (speakingSentence != null)
                 {
@@ -45,36 +51,29 @@ namespace NoiseBot.Commands.VoiceCommands.VoiceRecognition
                 speakingSentence.Elapsed += (sender, args) => OnTimedEvent(sender, args, fs);
                 speakingSentence.Start();
 
-                //e.Client.DebugLogger.LogMessage(LogLevel.Debug, "VNEXT RX", $"{e.User?.Username ?? "Unknown user"} sent voice data.", DateTime.Now);
+                // e.Client.DebugLogger.LogMessage(LogLevel.Debug, "VNEXT RX", $"{e.User?.Username ?? "Unknown user"} sent voice data.", DateTime.Now);
                 var buff = e.Voice.ToArray();
                 fs.Write(buff, 0, buff.Length);
                 fs.Flush();
             }
+            return Task.CompletedTask;
         }
 
         private Task OnUserSpeaking(UserSpeakingEventArgs e)
         {
-            if (this._ssrc_map.ContainsKey(e.SSRC))
+            if (this.ssrcMap.ContainsKey(e.SSRC))
+            {
                 return Task.CompletedTask;
+            }
 
             if (e.User == null)
+            {
                 return Task.CompletedTask;
+            }
 
-            this._ssrc_map[e.SSRC] = e.User.Id;
+            this.ssrcMap[e.SSRC] = e.User.Id;
             return Task.CompletedTask;
         }
-        
-
-        private static void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e, FileStream fs)
-        {
-            fs.Close();
-            if(source is Timer timer)
-            {
-                timer.Stop();
-                timer.Dispose();
-            }
-        }
-
 
         [Command("StartListen"), Description("Start voice recognition")]
         public async Task StartListen(CommandContext ctx)
@@ -84,8 +83,8 @@ namespace NoiseBot.Commands.VoiceCommands.VoiceRecognition
             VoiceNextConnection voiceNextCon = voiceNextClient.GetConnection(ctx.Guild);
             if (voiceNextClient.IsIncomingEnabled)
             {
-                this._ssrc_map = new ConcurrentDictionary<uint, ulong>();
-                this._ssrc_filemap = new ConcurrentDictionary<uint, FileStream>();
+                this.ssrcMap = new ConcurrentDictionary<uint, ulong>();
+                this.ssrcFilemap = new ConcurrentDictionary<uint, FileStream>();
                 voiceNextCon.VoiceReceived += this.OnVoiceReceived;
                 voiceNextCon.UserSpeaking += this.OnUserSpeaking;
             }
@@ -100,14 +99,12 @@ namespace NoiseBot.Commands.VoiceCommands.VoiceRecognition
                 VoiceNextConnection voiceNextCon = ctx.Client.GetVoiceNext().GetConnection(ctx.Guild);
                 if (voiceNextClient.IsIncomingEnabled)
                 {
-                    this._ssrc_map = new ConcurrentDictionary<uint, ulong>();
-                    this._ssrc_filemap = new ConcurrentDictionary<uint, FileStream>();
+                    this.ssrcMap = new ConcurrentDictionary<uint, ulong>();
+                    this.ssrcFilemap = new ConcurrentDictionary<uint, FileStream>();
                     voiceNextCon.VoiceReceived += null;
                     voiceNextCon.UserSpeaking += null;
                 }
             }
         }
-
-
     }
 }

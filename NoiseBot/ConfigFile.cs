@@ -9,7 +9,7 @@ namespace NoiseBot
 {
     class ConfigFile
     {
-        private static readonly string configFilePath = "config.json";
+        private static readonly string ConfigFilePath = "config.json";
 
         private static ConfigFile instance;
 
@@ -19,7 +19,7 @@ namespace NoiseBot
             {
                 if (instance == null)
                 {
-                    instance = LoadConfigFromFile(configFilePath);
+                    instance = LoadConfigFromFile(ConfigFilePath);
                 }
                 return instance;
             }

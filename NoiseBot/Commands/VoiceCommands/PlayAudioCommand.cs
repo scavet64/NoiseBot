@@ -1,14 +1,8 @@
-﻿using System;
-using System.Diagnostics;
+﻿using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Attributes;
+using NoiseBot.Controllers;
 using System.IO;
 using System.Threading.Tasks;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.VoiceNext;
-using System.Threading;
-using System.Collections.Concurrent;
-using NoiseBot.Controllers;
 
 namespace NoiseBot.Commands.VoiceCommands
 {
@@ -42,7 +36,6 @@ namespace NoiseBot.Commands.VoiceCommands
             }
 
             int placeInQueue = AudioController.Instance.AddAudioToQueue(filename, vstat?.Channel, ctx.Guild);
-            //maybe say added to queue?
             await ctx.RespondAsync(string.Format("Added to the play queue: {0} in line", placeInQueue));
             return;
         }

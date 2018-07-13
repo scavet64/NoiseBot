@@ -1,34 +1,23 @@
-﻿using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.EventArgs;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
+﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using DSharpPlus.VoiceNext;
-using DSharpPlus;
 using DSharpPlus.EventArgs;
-using System.Collections.Concurrent;
-using System.Linq;
-using System.Timers;
-using System.Threading;
 using NoiseBot.Commands.VoiceCommands.CustomVoiceCommands;
-using NoiseBot.Extensions;
 using NoiseBot.Controllers;
+using NoiseBot.Extensions;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
 {
     class CustomIntroCommand : PlayAudioCommand
     {
         private List<DiscordUser> users = new List<DiscordUser>();
-        private bool IsDoingIntros  = false;
-        //private AutoResetEvent NewUserJoinedWaitHandle = new AutoResetEvent(false);
+        private bool isDoingIntros = false;
 
         BlockingCollection<IntroQueueElement> introQueue = new BlockingCollection<IntroQueueElement>();
 
@@ -42,18 +31,18 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
         public CustomIntroCommand()
         {
             Program.Client.VoiceStateUpdated += Client_VoiceStateUpdated;
-            IsDoingIntros = true;
+            isDoingIntros = true;
 
             var t = new Thread(() => IntroMethodThread());
             t.Start();
         }
 
-        private async Task Client_VoiceStateUpdated(VoiceStateUpdateEventArgs e)
+        private Task Client_VoiceStateUpdated(VoiceStateUpdateEventArgs e)
         {
-            //Ignore bots joining
+            // Ignore bots joining
             if (e.User.IsBot)
             {
-                return;
+                return Task.CompletedTask;
             }
             try
             {
@@ -71,7 +60,6 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
                         introQueue.Add(introQueueElement);
 
                         e.Client.DebugLogger.LogMessage(LogLevel.Debug, "NoiseBot", string.Format("{0} joined channel {1}", e.User, e.After.Channel.Name), DateTime.Now);
-                        //NewUserJoinedWaitHandle.Set();
                     }
                     else if (e.After.Channel == null && e.Before.Channel != null)
                     {
@@ -83,22 +71,21 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
             {
                 e.Client.DebugLogger.LogMessage(LogLevel.Info, "ExampleBot", string.Format("{0}", ex.Message), DateTime.Now);
             }
-            return;
+            return Task.CompletedTask;
         }
 
         [Command("StartIntro"), Description("Start doing intros")]
         public async Task StartIntro(CommandContext ctx)
         {
-            if (!IsDoingIntros)
+            if (!isDoingIntros)
             {
                 ctx.Client.VoiceStateUpdated += Client_VoiceStateUpdated;
-                IsDoingIntros = true;
+                isDoingIntros = true;
 
                 await ctx.RespondAsync("I will now introduce people as they join voice chat");
-                //await JoinIfNotConnected(ctx);
                 var t = new Thread(() => IntroMethodThread());
                 t.Start();
-            } 
+            }
             else
             {
                 await ctx.RespondAsync("Already doing intros. To reset, use the `StopIntro` command");
@@ -107,10 +94,11 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
         }
 
         [Command("StopIntro"), Description("Stop doing intros")]
-        public async Task StopIntro(CommandContext ctx)
+        public Task StopIntro(CommandContext ctx)
         {
             ctx.Client.VoiceStateUpdated += NullVoiceStateUpdateHandler;
-            IsDoingIntros = false;
+            isDoingIntros = false;
+            return Task.CompletedTask;
         }
 
         private Task NullVoiceStateUpdateHandler(VoiceStateUpdateEventArgs e)
@@ -118,13 +106,12 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
             return Task.CompletedTask;
         }
 
-        private async void IntroMethodThread()
+        private void IntroMethodThread()
         {
-            while (IsDoingIntros)
+            while (isDoingIntros)
             {
                 IntroQueueElement introQueueElement = introQueue.Take();
-                //NewUserJoinedWaitHandle.WaitOne();
-                if (IsDoingIntros)
+                if (isDoingIntros)
                 {
                     CustomIntroModel introModel = CustomIntroFile.Instance.GetIntroForUsername(introQueueElement.NewUser.Username);
                     string filepath;
@@ -154,12 +141,12 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
                 return;
             }
 
-            //do you have an intro already?
+            // do you have an intro already?
             CustomIntroModel introModel = CustomIntroFile.Instance.GetIntroForUsername(ctx.User.Username);
-            if(introModel != null)
+            if (introModel != null)
             {
-                //user already has an intro
-                if(!CustomIntroFile.Instance.ChangeIntro(ctx.User.Username, custCom.Filepath))
+                // user already has an intro
+                if (!CustomIntroFile.Instance.ChangeIntro(ctx.User.Username, custCom.Filepath))
                 {
                     await ctx.RespondAsync(string.Format("I could not change your intro for some reason :^)"));
                     return;

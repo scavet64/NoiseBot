@@ -12,9 +12,10 @@ namespace NoiseBot.Commands.VoiceCommands
     class EmoteCommands : PlayAudioCommand
     {
         [Command("StartEmote"), Description("Start doing emote stuff")]
-        public async Task StartEmote(CommandContext ctx)
+        public Task StartEmote(CommandContext ctx)
         {
             ctx.Client.MessageCreated += Client_MessageCreatedAsync;
+            return Task.CompletedTask;
         }
 
         private async Task Client_MessageCreatedAsync(DSharpPlus.EventArgs.MessageCreateEventArgs e)
@@ -25,7 +26,7 @@ namespace NoiseBot.Commands.VoiceCommands
                 VoiceNextConnection voiceNextCon = voiceNextClient.GetConnection(e.Guild);
                 if (voiceNextCon == null)
                 {
-                    foreach(DiscordVoiceState vs in e.Guild.VoiceStates)
+                    foreach (DiscordVoiceState vs in e.Guild.VoiceStates)
                     {
                         if (vs.User.Username.Equals(e.Author.Username))
                         {
@@ -33,14 +34,14 @@ namespace NoiseBot.Commands.VoiceCommands
                         }
                     }
                 }
-                if(voiceNextCon == null)
+                if (voiceNextCon == null)
                 {
-                    //user wasnt in a voice channel
+                    // user wasnt in a voice channel
                     return;
                 }
                 else
                 {
-                    //await PlayAudio(voiceNextCon, @"AudioFiles\foodReview.mp3");
+                    // await PlayAudio(voiceNextCon, @"AudioFiles\foodReview.mp3");
                     voiceNextCon.Disconnect();
                 }
             }

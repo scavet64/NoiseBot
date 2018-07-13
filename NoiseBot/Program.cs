@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -9,14 +7,11 @@ using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.VoiceNext;
 using DSharpPlus.VoiceNext.Codec;
-using Newtonsoft.Json;
-using NoiseBot.Exceptions;
 using NoiseBot.Commands.VoiceCommands;
-using NoiseBot.Commands.VoiceCommands.VoiceRecognition;
-using NoiseBot.Commands.VoiceCommands.CustomVoiceCommands;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using NoiseBot.Commands.VoiceCommands.CustomIntroCommands;
+using NoiseBot.Commands.VoiceCommands.CustomVoiceCommands;
+using NoiseBot.Commands.VoiceCommands.VoiceRecognition;
+using NoiseBot.Exceptions;
 using NoiseBot.Extensions;
 
 namespace NoiseBot
@@ -81,23 +76,23 @@ namespace NoiseBot
             // DSharpPlus.WebSocket.WebSocket4Net from NuGet,
             // add appropriate usings, and uncomment the following
             // line
-            //this.Client.SetWebSocketClient<WebSocket4NetClient>();
+            // this.Client.SetWebSocketClient<WebSocket4NetClient>();
 
             // If you are on Windows 7 and using .NET Core, install 
             // DSharpPlus.WebSocket.WebSocket4NetCore from NuGet,
             // add appropriate usings, and uncomment the following
             // line
-            //this.Client.SetWebSocketClient<WebSocket4NetCoreClient>();
+            // this.Client.SetWebSocketClient<WebSocket4NetCoreClient>();
 
             // If you are using Mono, install 
             // DSharpPlus.WebSocket.WebSocketSharp from NuGet,
             // add appropriate usings, and uncomment the following
             // line
-            //this.Client.SetWebSocketClient<WebSocketSharpClient>();
+            // this.Client.SetWebSocketClient<WebSocketSharpClient>();
 
             // if using any alternate socket client implementations, 
             // remember to add the following to the top of this file:
-            //using DSharpPlus.Net.WebSocket;
+            // using DSharpPlus.Net.WebSocket;
 
             // next, let's hook some events, so we know
             // what's going on
@@ -232,7 +227,7 @@ namespace NoiseBot
                     Description = $"{emoji} You do not have the permissions required to execute this command.",
                     Color = new DiscordColor(0xFF0000) // red
                 };
-                await e.Context.RespondAsync("", embed: embed);
+                await e.Context.RespondAsync(string.Empty, embed: embed);
             }
         }
     }

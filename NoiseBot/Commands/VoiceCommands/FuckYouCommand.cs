@@ -12,18 +12,18 @@ namespace NoiseBot.Commands.VoiceCommands
     class FuckYouCommand : PlayAudioCommand
     {
         [Command("fuckyou"), Description("")]
-        public async Task Worms(CommandContext ctx)
+        public async Task Fuckyou(CommandContext ctx)
         {
-            string wormsFilePath = @"AudioFiles\fuckyou.mp3";
+            string fuckyoupath = @"AudioFiles\fuckyou.mp3";
             // check if file exists
-            if (!File.Exists(wormsFilePath))
+            if (!File.Exists(fuckyoupath))
             {
                 // file does not exist
                 await ctx.RespondAsync("Cant find the file");
                 return;
             }
 
-            await Play(ctx, wormsFilePath);
+            await Play(ctx, fuckyoupath);
         }
     }
 }

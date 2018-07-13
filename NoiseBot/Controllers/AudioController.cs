@@ -15,28 +15,30 @@ using System.Threading.Tasks;
 
 namespace NoiseBot.Controllers
 {
+    /// <summary>
+    /// Audio controller. This class is responsible for managing and playing any audio into the server.
+    /// </summary>
     public class AudioController
     {
         private static object lockingObject = new object();
 
-        private BlockingCollection<PlayQueueElement> playQueue = new BlockingCollection<PlayQueueElement>();
-
-        private class PlayQueueElement
-        {
-            public string Filepath { get; set; }
-            public DiscordChannel ChannelToJoin { get; set; }
-            public DiscordGuild GuildToJoin { get; set; }
-        }
-
         private static AudioController instance;
+
+        /// <summary>
+        /// Gets or sets the singleton instance.
+        /// </summary>
+        /// <value>
+        /// The instance.
+        /// </value>
         public static AudioController Instance
         {
-            get {
+            get
+            {
                 if (instance == null)
                 {
                     lock (lockingObject)
                     {
-                        if(instance == null)
+                        if (instance == null)
                         {
                             instance = new AudioController();
                         }
@@ -47,6 +49,14 @@ namespace NoiseBot.Controllers
             set { instance = value; }
         }
 
+        private BlockingCollection<PlayQueueElement> playQueue = new BlockingCollection<PlayQueueElement>();
+
+        private class PlayQueueElement
+        {
+            public string Filepath { get; set; }
+            public DiscordChannel ChannelToJoin { get; set; }
+            public DiscordGuild GuildToJoin { get; set; }
+        }
 
         private AudioController()
         {
@@ -54,13 +64,20 @@ namespace NoiseBot.Controllers
             t.Start();
         }
 
-        public int AddAudioToQueue(string filepath, DiscordChannel ChannelToJoin, DiscordGuild GuildToJoin)
+        /// <summary>
+        /// Adds the audio to queue.
+        /// </summary>
+        /// <param name="filepath">The filepath.</param>
+        /// <param name="channelToJoin">The channel to join.</param>
+        /// <param name="guildToJoin">The guild to join.</param>
+        /// <returns>position in the queue</returns>
+        public int AddAudioToQueue(string filepath, DiscordChannel channelToJoin, DiscordGuild guildToJoin)
         {
             PlayQueueElement playQueueElement = new PlayQueueElement
             {
                 Filepath = filepath,
-                ChannelToJoin = ChannelToJoin,
-                GuildToJoin = GuildToJoin
+                ChannelToJoin = channelToJoin,
+                GuildToJoin = guildToJoin
             };
             playQueue.Add(playQueueElement);
             Program.Client.DebugLogger.Info(string.Format("Added playing file [{0}] to the queue", filepath));
@@ -74,7 +91,7 @@ namespace NoiseBot.Controllers
             {
                 PlayQueueElement elementToPlay = playQueue.Take();
 
-                //Connect if not already
+                // Connect if not already
                 VoiceNextExtension voiceNextClient = Program.Client.GetVoiceNext();
                 VoiceNextConnection voiceNextCon = voiceNextClient.GetConnection(elementToPlay.GuildToJoin);
                 if (voiceNextCon == null)
@@ -95,7 +112,7 @@ namespace NoiseBot.Controllers
         /// </summary>
         /// <param name="ctx">The command context</param>
         /// <param name="filename">The filename.</param>
-        /// <returns></returns>
+        /// <returns>Completed Task</returns>
         private async Task PlayCommandAudio(CommandContext ctx, string filename)
         {
             // check whether VNext is enabled
@@ -123,7 +140,13 @@ namespace NoiseBot.Controllers
             }
         }
 
-        public async static Task PlayAudio(VoiceNextConnection voiceNextCon, string filename)
+        /// <summary>
+        /// Plays the audio.
+        /// </summary>
+        /// <param name="voiceNextCon">The voice next con.</param>
+        /// <param name="filename">The filename.</param>
+        /// <returns>Completed Task once the audio finishes playing</returns>
+        public async Task PlayAudio(VoiceNextConnection voiceNextCon, string filename)
         {
             // wait for current playback to finish
             while (voiceNextCon.IsPlaying)
@@ -135,9 +158,6 @@ namespace NoiseBot.Controllers
             await voiceNextCon.SendSpeakingAsync(true);
             try
             {
-                // borrowed from
-                // https://github.com/RogueException/Discord.Net/blob/5ade1e387bb8ea808a9d858328e2d3db23fe0663/docs/guides/voice/samples/audio_create_ffmpeg.cs
-
                 var ffmpeg_inf = new ProcessStartInfo
                 {
                     FileName = "ffmpeg",
@@ -180,6 +200,5 @@ namespace NoiseBot.Controllers
                 await voiceNextCon.SendSpeakingAsync(false);
             }
         }
-
     }
 }

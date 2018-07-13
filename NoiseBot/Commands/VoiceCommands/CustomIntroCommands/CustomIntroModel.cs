@@ -5,11 +5,26 @@ using System.Text;
 
 namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
 {
+    /// <summary>
+    /// Model class for the json seralization and deserailization of custom intros
+    /// </summary>
     public class CustomIntroModel
     {
+        /// <summary>
+        /// Gets the username.
+        /// </summary>
+        /// <value>
+        /// The username.
+        /// </value>
         [JsonProperty("username")]
         public string Username { get; private set; }
 
+        /// <summary>
+        /// Gets or sets the filepath.
+        /// </summary>
+        /// <value>
+        /// The filepath.
+        /// </value>
         [JsonProperty("filepath")]
         public string Filepath { get; set; }
 

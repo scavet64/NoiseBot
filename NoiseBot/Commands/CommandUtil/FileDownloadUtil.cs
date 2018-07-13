@@ -11,8 +11,16 @@ using System.Threading.Tasks;
 
 namespace NoiseBot.Commands.CommandUtil
 {
+    /// <summary>
+    /// File Download Utility. Responsible for downloading files from discord
+    /// </summary>
     public static class FileDownloadUtil
     {
+        /// <summary>
+        /// Downloads the file from discord message asynchronously.
+        /// </summary>
+        /// <param name="context">The context where the file was attached.</param>
+        /// <returns>Completed Task of type boolean. True if the process was a success</returns>
         public static async Task<bool> DownloadFileFromDiscordMessageAsync(CommandContext context)
         {
             if (context.Message.Attachments.Count <= 0)

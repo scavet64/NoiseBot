@@ -1,15 +1,11 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
-using DSharpPlus.CommandsNext;
+﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using DSharpPlus.VoiceNext;
-using System.Net;
-using System.Collections.Generic;
 using NoiseBot.Commands.CommandUtil;
 using NoiseBot.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
 {
@@ -98,7 +94,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
         public async Task ListCustom(CommandContext ctx, [RemainingText, Description("Name of the command")] string customCommandName)
         {
             List<string> custCom = CustomAudioCommandFile.Instance.GetAllCustomCommandNames();
-            string content = "";
+            string content = string.Empty;
             foreach (string name in custCom)
             {
                 content += ConfigFile.Instance.CommandPrefix + ". " + name + "\n";

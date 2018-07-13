@@ -267,3 +267,5 @@ NoiseBot/AudioFiles/
 NoiseBot/CustomAudioCommands\.json
 
 NoiseBot/CustomIntros\.json
+
+NoiseBot/StyleCop\.Cache
