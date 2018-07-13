@@ -29,5 +29,33 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
             this.CommandName = commandName;
             this.Filepath = filepath;
         }
+
+        // override object.Equals
+        public override bool Equals(object obj)
+        {
+            bool equal = false;
+
+            if (obj != null && obj is CustomAudioCommandModel other)
+            {
+                equal = (this.CommandName.Equals(other.CommandName) && this.Filepath.Equals(other.Filepath));
+            }
+
+            return equal;
+        }
+
+        // override object.GetHashCode
+        public override int GetHashCode()
+        {
+            int hash = 13;
+            if(CommandName != null)
+            {
+                hash += CommandName.GetHashCode();
+            }
+            if(Filepath != null)
+            {
+                hash += Filepath.GetHashCode();
+            }
+            return hash;
+        }
     }
 }

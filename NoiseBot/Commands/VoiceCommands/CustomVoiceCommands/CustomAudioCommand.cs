@@ -51,6 +51,49 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
             }
         }
 
+        [Command("CustomDelete"), Description("Deletes a custom audio command.")]
+        public async Task DeleteCustom(CommandContext ctx, [RemainingText, Description("Name of the command")] string customCommandName)
+        {
+            CustomAudioCommandModel custCom = CustomAudioCommandFile.Instance.GetAudioFileForCommand(customCommandName);
+            if (custCom == null)
+            {
+                await ctx.RespondAsync(string.Format("Could not find a command with the name `{0}` :^(", customCommandName));
+                return;
+            }
+
+            if (CustomAudioCommandFile.Instance.DeleteCustomCommand(custCom))
+            {
+                await ctx.RespondAsync(string.Format("Custom command `{0}` was deleted :^)", customCommandName));
+            }
+            else
+            {
+                await ctx.RespondAsync(string.Format("Custom command `{0}` could not be deleted :^(", customCommandName));
+            }
+        }
+
+        [Command("CustomRename"), Description("Renames a custom audio command.")]
+        public async Task DeleteCustom(
+            CommandContext ctx, 
+            [Description("Old name of the command")] string customCommandName,
+            [Description("New name of the command")] string newCustomCommandName)
+        {
+            bool success = false;
+            try
+            {
+                success = CustomAudioCommandFile.Instance.RenameCustomCommand(customCommandName, newCustomCommandName);
+            }
+            catch (ArgumentException)
+            {
+                await ctx.RespondAsync(string.Format("Could not find a command with the name `{0}` :^(", customCommandName));
+                return;
+            }
+
+            if (success)
+            {
+                await ctx.RespondAsync(string.Format("Custom command `{0}` was renamed to `{1}` :^)", customCommandName, newCustomCommandName));
+            }
+        }
+
         [Command("CustomList"), Description("Get a list of all custom commands")]
         public async Task ListCustom(CommandContext ctx, [RemainingText, Description("Name of the command")] string customCommandName)
         {

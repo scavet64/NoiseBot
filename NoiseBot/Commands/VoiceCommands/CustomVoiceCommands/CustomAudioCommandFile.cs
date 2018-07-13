@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
 using NoiseBot.Exceptions;
+using NoiseBot.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 
@@ -12,6 +14,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
     /// </summary>
     public class CustomAudioCommandFile
     {
+        private static readonly object lockObject = new object();
         private static readonly string commandFilePath = "CustomAudioCommands.json";
         private static CustomAudioCommandFile instance;
 
@@ -21,7 +24,13 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
             {
                 if (instance == null)
                 {
-                    instance = LoadConfigFromFile(commandFilePath);
+                    lock (lockObject)
+                    {
+                        if (instance == null)
+                        {
+                            instance = LoadConfigFromFile(commandFilePath);
+                        }
+                    }
                 }
                 return instance;
             }
@@ -29,14 +38,20 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
         }
 
         [JsonProperty("CustomAudioCommands")]
-        private List<CustomAudioCommandModel> customAudioCommands;
+        private ObservableCollection<CustomAudioCommandModel> customAudioCommands;
 
         /// <summary>
         /// Prevents a default instance of the <see cref="CustomAudioCommandFile"/> class from being created.
         /// </summary>
         private CustomAudioCommandFile()
         {
-            customAudioCommands = new List<CustomAudioCommandModel>();
+            customAudioCommands = new ObservableCollection<CustomAudioCommandModel>();
+            customAudioCommands.CollectionChanged += CustomAudioCommands_CollectionChanged;
+        }
+
+        private void CustomAudioCommands_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            SaveFile();
         }
 
         private static CustomAudioCommandFile LoadConfigFromFile(string filePath)
@@ -87,6 +102,38 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
             return null;
         }
 
+        public bool DeleteCustomCommand(CustomAudioCommandModel custCom)
+        {
+            if (custCom == null)
+            {
+                throw new ArgumentException("Argument cannot be null");
+            }
+            else if (custCom.CommandName == null || custCom.Filepath == null)
+            {
+                throw new ArgumentException("Invalid custom command object. Properties were null");
+            }
+
+            bool success;
+
+            try
+            {
+                FileInfo fileInfo = new FileInfo(custCom.Filepath);
+                if (fileInfo.Exists)
+                {
+                    fileInfo.Delete();
+                }
+
+                success = customAudioCommands.Remove(custCom);
+            }
+            catch (SystemException sysEx)
+            {
+                Program.Client.DebugLogger.Error("Could not delete file: " + sysEx.Message);
+                success = false;
+            }
+
+            return success;
+        }
+
         public void AddCustomCommand(string commandName, string customAudioFile)
         {
             AddCustomCommand(new CustomAudioCommandModel(commandName, customAudioFile));
@@ -95,23 +142,41 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
         public void AddCustomCommand(CustomAudioCommandModel commandToAdd)
         {
             customAudioCommands.Add(commandToAdd);
-            SaveFile();
+        }
+
+        public bool RenameCustomCommand(string oldCommandName, string newCommandName)
+        {
+            CustomAudioCommandModel custCom = GetAudioFileForCommand(oldCommandName);
+            if (custCom == null)
+            {
+                throw new ArgumentException("Could not find old command in the list");
+            }
+
+            customAudioCommands.Remove(custCom);
+            customAudioCommands.Add(new CustomAudioCommandModel(newCommandName, custCom.Filepath));
+
+            return true;
         }
 
         private void SaveFile()
         {
-            using (StreamWriter file = File.CreateText(commandFilePath))
+            if (instance != null)
             {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(file, Instance);
+                lock (instance)
+                {
+                    using (StreamWriter file = File.CreateText(commandFilePath))
+                    {
+                        JsonSerializer serializer = new JsonSerializer();
+                        serializer.Serialize(file, Instance);
+                    }
+                }
             }
-
         }
 
         public List<string> GetAllCustomCommandNames()
         {
             List<string> commandNames = new List<string>();
-            foreach(CustomAudioCommandModel command in customAudioCommands)
+            foreach (CustomAudioCommandModel command in customAudioCommands)
             {
                 commandNames.Add(command.CommandName);
             }
