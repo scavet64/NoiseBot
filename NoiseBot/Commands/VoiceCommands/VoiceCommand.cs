@@ -18,13 +18,18 @@ namespace NoiseBot.Commands.VoiceCommands
     /// <summary>
     /// Base class for any voice commands. Holds basic functionality for anything relating to a voice command such as joining
     /// </summary>
-    class VoiceCommand : BaseCommandModule
+    public class VoiceCommand : BaseCommandModule
     {
         [Command("join"), Description("Joins a voice channel.")]
         public async Task Join(CommandContext context, DiscordChannel chn = null)
         {
+            await JoinVoice(context, chn);
+        }
+
+        public static async Task JoinVoice(CommandContext context, DiscordChannel chn = null)
+        {
             // check whether we aren't already connected
-            if(await IsClientConnected(context))
+            if (await IsClientConnected(context))
             {
                 await context.RespondAsync("Already connected in this guild.");
                 return;
@@ -57,7 +62,6 @@ namespace NoiseBot.Commands.VoiceCommands
                 context.Client.DebugLogger.LogMessage(LogLevel.Critical, "NoiseBot", "Missing Required DLL for Voice Chat", DateTime.Now);
                 await context.RespondAsync("Missing dependant files. Contact your bot manager");
             }
-
         }
 
         [Command("leave"), Description("Leaves a voice channel.")]
@@ -95,7 +99,7 @@ namespace NoiseBot.Commands.VoiceCommands
         /// <param name="context">The context.</param>
         /// <param name="vnext">The vnext.</param>
         /// <returns>true if connected</returns>
-        public async Task<bool> IsClientConnected(CommandContext context)
+        public static async Task<bool> IsClientConnected(CommandContext context)
         {
             var vnext = context.Client.GetVoiceNext();
             if (vnext == null)
@@ -117,13 +121,13 @@ namespace NoiseBot.Commands.VoiceCommands
             }
         }
 
-        public async Task JoinIfNotConnected(CommandContext context)
+        public static async Task JoinIfNotConnected(CommandContext context)
         {
             //Check connection
             if (!await IsClientConnected(context))
             {
                 //not connected, so join
-                await Join(context);
+                await JoinVoice(context);
             }
         }
     }

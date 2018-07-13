@@ -20,6 +20,7 @@ using System.Timers;
 using System.Threading;
 using NoiseBot.Commands.VoiceCommands.CustomVoiceCommands;
 using NoiseBot.Extensions;
+using NoiseBot.Controllers;
 
 namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
 {
@@ -103,7 +104,6 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
                 await ctx.RespondAsync("Already doing intros. To reset, use the `StopIntro` command");
                 return;
             }
-
         }
 
         [Command("StopIntro"), Description("Stop doing intros")]
@@ -146,7 +146,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
                         filepath = @"AudioFiles\fuckyou.mp3";
                     }
                     var vnc = Program.Client.GetVoiceNext().GetConnection(introQueueElement.GuildToJoin);
-                    await PlayAudio(vnc, filepath);
+                    await AudioController.PlayAudio(vnc, filepath); //TODO: Make this use the play audio queue
                     vnc.Disconnect();
                 }
             }
