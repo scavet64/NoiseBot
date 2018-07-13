@@ -111,7 +111,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
                 Description = string.Format("To use a custom command use `{0}. ` followed by the desired command", ConfigFile.Instance.CommandPrefix)
             };
 
-            embed.AddField("Custom Commands:", content);
+            embed.AddField($"{custCom.Count} Custom Commands:", content);
             await ctx.RespondAsync(embed: embed);
         }
     }

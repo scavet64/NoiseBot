@@ -180,6 +180,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
             {
                 commandNames.Add(command.CommandName);
             }
+            commandNames.Sort();
             return commandNames;
         }
 
