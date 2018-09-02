@@ -109,7 +109,7 @@ namespace NoiseBot.Controllers
                         }
                         else
                         {
-                            Program.Client.DebugLogger.Error($"Could not channel");
+                            Program.Client.DebugLogger.Error($"Could not join: {voiceNextCon.Channel}");
                             continue;
                         }
                         
