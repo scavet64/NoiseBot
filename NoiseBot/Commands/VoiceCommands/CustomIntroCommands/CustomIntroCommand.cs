@@ -16,7 +16,8 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
 {
     class CustomIntroCommand : PlayAudioCommand
     {
-        private List<DiscordUser> users = new List<DiscordUser>();
+        //private List<DiscordUser> users = new List<DiscordUser>();
+        private static readonly object LockObject = new object();
         private bool isDoingIntros = false;
 
         BlockingCollection<IntroQueueElement> introQueue = new BlockingCollection<IntroQueueElement>();
@@ -39,14 +40,20 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
 
         private Task Client_VoiceStateUpdated(VoiceStateUpdateEventArgs e)
         {
+            if(e == null)
+            {
+                //for some reason it returns null event args sometimes?
+                return Task.CompletedTask;
+            }
+
             // Ignore bots joining
-            if (e.User.IsBot)
+            if (e.User == null || e.User.IsBot)
             {
                 return Task.CompletedTask;
             }
             try
             {
-                lock (users)
+                lock (LockObject)
                 {
                     if (e.After.Channel != null && (e.Before == null || e.Before.Channel == null))
                     {
@@ -69,7 +76,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
             }
             catch (Exception ex)
             {
-                e.Client.DebugLogger.LogMessage(LogLevel.Info, "ExampleBot", string.Format("{0}", ex.Message), DateTime.Now);
+                e.Client.DebugLogger.LogMessage(LogLevel.Critical, "ExampleBot", string.Format("{0}", ex), DateTime.Now);
             }
             return Task.CompletedTask;
         }
@@ -117,7 +124,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
                     string filepath;
                     if (introModel != null)
                     {
-                        Program.Client.DebugLogger.Warn(string.Format("Playing {0} for {1}", introModel.Filepath, introQueueElement.NewUser.Username));
+                        Program.Client.DebugLogger.Info(string.Format("Playing {0} for {1}", introModel.Filepath, introQueueElement.NewUser.Username));
                         filepath = introModel.Filepath;
                     }
                     else
