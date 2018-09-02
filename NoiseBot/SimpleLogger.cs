@@ -7,6 +7,9 @@ using System.Text;
 
 namespace NoiseBot
 {
+    /// <summary>
+    /// Simple logger class
+    /// </summary>
     public class SimpleLogger
     {
         //private static readonly Settings Settings = Settings.Default;
