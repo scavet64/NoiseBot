@@ -101,6 +101,9 @@ namespace NoiseBot
             Client.Ready += this.Client_Ready;
             Client.GuildAvailable += this.Client_GuildAvailable;
             Client.ClientErrored += this.Client_ClientError;
+            Client.PresenceUpdated += Client_PresenceUpdated;
+            Client.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
+            
 
             // up next, let's set up our commands
             var ccfg = new CommandsNextConfiguration
@@ -159,6 +162,30 @@ namespace NoiseBot
         {
             logger.WriteLine(e.ToString());
         }
+
+        private Task Client_PresenceUpdated(PresenceUpdateEventArgs e)
+        {
+            if (e.PresenceAfter.Activity.ActivityType == ActivityType.Playing && !string.IsNullOrWhiteSpace(e.PresenceAfter.Activity.Name))
+            {
+                //playing a game
+            }
+            else if (e.PresenceAfter.Activity.ActivityType == ActivityType.ListeningTo)
+            {
+                Client.DebugLogger.Info(string.Format("{0} is now listening to {1} by {2}", e.User.Username, e.PresenceAfter.Activity.RichPresence.Details, e.PresenceAfter.Activity.RichPresence.State));
+                //listening to a song
+            }
+            else if (e.PresenceAfter.Status == UserStatus.Online && e.PresenceBefore.Status == UserStatus.Offline)
+            {
+                Client.DebugLogger.Info(string.Format("{0} is now online", e.User.Username));
+            }
+            else if (e.PresenceAfter.Status == UserStatus.Offline && e.PresenceBefore.Status == UserStatus.Online)
+            {
+                Client.DebugLogger.Info(string.Format("{0} is now offline", e.User.Username));
+            }
+
+            return Task.CompletedTask;
+        }
+
         private Task Client_TypingStarted(TypingStartEventArgs e)
         {
             e.Channel.SendMessageAsync(":^)");
