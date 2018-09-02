@@ -100,8 +100,19 @@ namespace NoiseBot.Controllers
                     if (voiceNextCon == null)
                     {
                         Program.Client.DebugLogger.Info($"Not currently connected");
-                        voiceNextCon = await voiceNextClient.ConnectAsync(elementToPlay.ChannelToJoin);
-                        Program.Client.DebugLogger.Info($"Joined: {voiceNextCon.Channel}");
+                        Task<VoiceNextConnection> voiceNextConTask = voiceNextClient.ConnectAsync(elementToPlay.ChannelToJoin);
+                        voiceNextConTask.Wait(new TimeSpan(0, 0, 3));
+                        if(voiceNextConTask.IsCompletedSuccessfully)
+                        {
+                            voiceNextCon = voiceNextConTask.Result;
+                            Program.Client.DebugLogger.Info($"Joined: {voiceNextCon.Channel}");
+                        }
+                        else
+                        {
+                            Program.Client.DebugLogger.Error($"Could not channel");
+                            continue;
+                        }
+                        
                     }
 
                     await PlayAudio(voiceNextCon, elementToPlay.Filepath);
