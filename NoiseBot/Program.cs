@@ -18,7 +18,7 @@ namespace NoiseBot
 {
     class Program
     {
-        private static readonly SimpleLogger logger = SimpleLogger.GetSimpleLogger();
+        private static readonly SimpleLogger Logger = SimpleLogger.GetSimpleLogger();
 
         public static DiscordClient Client { get; set; }
         public CommandsNextExtension Commands { get; set; }
@@ -161,7 +161,7 @@ namespace NoiseBot
 
         private void DebugLogger_LogMessageReceived(object sender, DebugLogMessageEventArgs e)
         {
-            logger.WriteLine(e.ToString());
+            Logger.WriteLine(e.ToString());
         }
 
         private Task Client_PresenceUpdated(PresenceUpdateEventArgs e)

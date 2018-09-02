@@ -1,25 +1,39 @@
-﻿using DSharpPlus.CommandsNext.Converters;
+﻿using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Converters;
+using DSharpPlus.CommandsNext.Entities;
+using DSharpPlus.Entities;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Entities;
 using System.Linq;
-using DSharpPlus.Entities;
+using System.Text;
 
 namespace NoiseBot
 {
+    /// <summary>
+    /// Help formatter class. Formats the help message to look pretty
+    /// </summary>
+    /// <seealso cref="DSharpPlus.CommandsNext.Converters.BaseHelpFormatter" />
     public class HelpFormatter : BaseHelpFormatter
     {
         private readonly ConfigFile config = ConfigFile.Instance;
 
         private StringBuilder Content { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HelpFormatter"/> class.
+        /// </summary>
+        /// <param name="ctx">Context in which this formatter is being invoked.</param>
         public HelpFormatter(CommandContext ctx) : base(ctx)
         {
             this.Content = new StringBuilder();
         }
 
+        /// <summary>
+        /// Constructs the help message.
+        /// </summary>
+        /// <returns>
+        /// Data for the help message.
+        /// </returns>
         public override CommandHelpMessage Build()
         {
             var embed = new DiscordEmbedBuilder
@@ -34,6 +48,13 @@ namespace NoiseBot
             return new CommandHelpMessage(null, discordEmbed);
         }
 
+        /// <summary>
+        /// Sets the command this help message will be for.
+        /// </summary>
+        /// <param name="command">Command for which the help message is being produced.</param>
+        /// <returns>
+        /// This help formatter.
+        /// </returns>
         public override BaseHelpFormatter WithCommand(Command command)
         {
             this.Content.Append(command.Description ?? "No description provided.")
@@ -58,7 +79,7 @@ namespace NoiseBot
                     {
                         sb.Append(arg.IsOptional || arg.IsCatchAll ? " [" : " <")
                             .Append(arg.Name)
-                            .Append(arg.IsCatchAll ? "..." : "")
+                            .Append(arg.IsCatchAll ? "..." : string.Empty)
                             .Append(arg.IsOptional || arg.IsCatchAll ? ']' : '>');
                     }
 
@@ -84,6 +105,13 @@ namespace NoiseBot
             return this;
         }
 
+        /// <summary>
+        /// Sets the subcommands for this command, if applicable. This method will be called with filtered data.
+        /// </summary>
+        /// <param name="subcommands">Subcommands for this command group.</param>
+        /// <returns>
+        /// This help formatter.
+        /// </returns>
         public override BaseHelpFormatter WithSubcommands(IEnumerable<Command> subcommands)
         {
             if (this.Content.Length == 0)

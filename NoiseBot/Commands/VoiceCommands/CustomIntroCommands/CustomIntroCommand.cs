@@ -40,7 +40,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
 
         private Task Client_VoiceStateUpdated(VoiceStateUpdateEventArgs e)
         {
-            if(e == null)
+            if (e == null)
             {
                 //for some reason it returns null event args sometimes?
                 return Task.CompletedTask;
