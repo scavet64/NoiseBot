@@ -18,6 +18,8 @@ namespace NoiseBot
 {
     class Program
     {
+        private static readonly SimpleLogger logger = SimpleLogger.GetSimpleLogger();
+
         public static DiscordClient Client { get; set; }
         public CommandsNextExtension Commands { get; set; }
         public VoiceNextExtension Voice { get; set; }
@@ -153,6 +155,10 @@ namespace NoiseBot
             await Task.Delay(-1);
         }
 
+        private void DebugLogger_LogMessageReceived(object sender, DebugLogMessageEventArgs e)
+        {
+            logger.WriteLine(e.ToString());
+        }
         private Task Client_TypingStarted(TypingStartEventArgs e)
         {
             e.Channel.SendMessageAsync(":^)");
