@@ -80,7 +80,7 @@ namespace NoiseBot.Controllers
                 GuildToJoin = guildToJoin
             };
             playQueue.Add(playQueueElement);
-            Program.Client.DebugLogger.Info(string.Format("Added playing file [{0}] to the queue", filepath));
+            Program.Client.DebugLogger.Info($"Added playing file [{filepath}] to position [{playQueue.Count}] of the queue");
 
             return playQueue.Count;
         }
@@ -89,54 +89,32 @@ namespace NoiseBot.Controllers
         {
             while (true)
             {
-                PlayQueueElement elementToPlay = playQueue.Take();
-
-                // Connect if not already
-                VoiceNextExtension voiceNextClient = Program.Client.GetVoiceNext();
-                VoiceNextConnection voiceNextCon = voiceNextClient.GetConnection(elementToPlay.GuildToJoin);
-                if (voiceNextCon == null)
+                try
                 {
-                    voiceNextCon = await voiceNextClient.ConnectAsync(elementToPlay.ChannelToJoin);
-                }
+                    PlayQueueElement elementToPlay = playQueue.Take();
+                    Program.Client.DebugLogger.Info($"Took [{elementToPlay.Filepath}] off the queue");
 
-                await PlayAudio(voiceNextCon, elementToPlay.Filepath);
-                if (playQueue.Count == 0)
+                    // Connect if not already
+                    VoiceNextExtension voiceNextClient = Program.Client.GetVoiceNext();
+                    VoiceNextConnection voiceNextCon = voiceNextClient.GetConnection(elementToPlay.GuildToJoin);
+                    if (voiceNextCon == null)
+                    {
+                        Program.Client.DebugLogger.Info($"Not currently connected");
+                        voiceNextCon = await voiceNextClient.ConnectAsync(elementToPlay.ChannelToJoin);
+                        Program.Client.DebugLogger.Info($"Joined: {voiceNextCon.Channel}");
+                    }
+
+                    await PlayAudio(voiceNextCon, elementToPlay.Filepath);
+                    if (playQueue.Count == 0)
+                    {
+                        voiceNextCon.Disconnect();
+                        Program.Client.DebugLogger.Info($"Leaving: {voiceNextCon.Channel}");
+                    }
+                }
+                catch (Exception ex)
                 {
-                    voiceNextCon.Disconnect();
+                    Program.Client.DebugLogger.Critical($"Exception was caught in the Audio Thread: {ex}");
                 }
-            }
-        }
-
-        /// <summary>
-        /// Plays audio that originally came from a command.
-        /// </summary>
-        /// <param name="ctx">The command context</param>
-        /// <param name="filename">The filename.</param>
-        /// <returns>Completed Task</returns>
-        private async Task PlayCommandAudio(CommandContext ctx, string filename)
-        {
-            // check whether VNext is enabled
-            await VoiceCommand.JoinIfNotConnected(ctx);
-            VoiceNextConnection voiceNextCon = ctx.Client.GetVoiceNext().GetConnection(ctx.Guild);
-            if (voiceNextCon == null)
-            {
-                // already connected
-                await ctx.RespondAsync("Not connected in this guild.");
-                return;
-            }
-
-            try
-            {
-                await PlayAudio(voiceNextCon, filename);
-
-                if (playQueue.Count == 0)
-                {
-                    voiceNextCon.Disconnect();
-                }
-            }
-            catch (Exception ex)
-            {
-                await ctx.RespondAsync($"An exception occured during playback: `{ex.GetType()}: {ex.Message}`");
             }
         }
 
@@ -151,6 +129,7 @@ namespace NoiseBot.Controllers
             // wait for current playback to finish
             while (voiceNextCon.IsPlaying)
             {
+                Program.Client.DebugLogger.Info($"Waiting for current audio to finish");
                 await voiceNextCon.WaitForPlaybackFinishAsync();
             }
 
@@ -193,11 +172,13 @@ namespace NoiseBot.Controllers
             }
             catch (Exception ex)
             {
+                Program.Client.DebugLogger.Info($"Exception playing audio {ex}");
                 throw ex;
             }
             finally
             {
                 await voiceNextCon.SendSpeakingAsync(false);
+                Program.Client.DebugLogger.Info($"Finished playing audio");
             }
         }
     }
