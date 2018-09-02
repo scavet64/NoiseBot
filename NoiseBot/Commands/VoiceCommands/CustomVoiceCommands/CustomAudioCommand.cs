@@ -110,5 +110,15 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
             embed.AddField($"{custCom.Count} Custom Commands:", content);
             await ctx.RespondAsync(embed: embed);
         }
+
+        [Command("Random"), Description("Plays a random command")]
+        public async Task RandomCommand(CommandContext ctx)
+        {
+            List<string> custCom = CustomAudioCommandFile.Instance.GetAllCustomCommandNames();
+
+            string command = custCom[new Random().Next(custCom.Count)];
+
+            await PlayCustom(ctx, command);
+        }
     }
 }
