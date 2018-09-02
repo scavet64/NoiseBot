@@ -81,7 +81,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
             return Task.CompletedTask;
         }
 
-        [Command("StartIntro"), Description("Start doing intros")]
+        [Command("StartIntro"), Description("Start doing intros"), RequirePermissions(DSharpPlus.Permissions.Administrator)]
         public async Task StartIntro(CommandContext ctx)
         {
             if (!isDoingIntros)
@@ -100,7 +100,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
             }
         }
 
-        [Command("StopIntro"), Description("Stop doing intros")]
+        [Command("StopIntro"), Description("Stop doing intros"), RequirePermissions(DSharpPlus.Permissions.Administrator)]
         public Task StopIntro(CommandContext ctx)
         {
             ctx.Client.VoiceStateUpdated += NullVoiceStateUpdateHandler;

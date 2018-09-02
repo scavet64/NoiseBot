@@ -75,7 +75,7 @@ namespace NoiseBot.Commands.VoiceCommands.VoiceRecognition
             return Task.CompletedTask;
         }
 
-        [Command("StartListen"), Description("Start voice recognition")]
+        [Command("StartListen"), Description("Start voice recognition"), RequirePermissions(DSharpPlus.Permissions.Administrator)]
         public async Task StartListen(CommandContext ctx)
         {
             await JoinIfNotConnected(ctx);
@@ -90,7 +90,7 @@ namespace NoiseBot.Commands.VoiceCommands.VoiceRecognition
             }
         }
 
-        [Command("StopListen"), Description("Stop voice recognition")]
+        [Command("StopListen"), Description("Stop voice recognition"), RequirePermissions(DSharpPlus.Permissions.Administrator)]
         public async Task StopListen(CommandContext ctx)
         {
             if (await IsClientConnected(ctx))
