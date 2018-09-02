@@ -136,6 +136,7 @@ namespace NoiseBot
             this.Commands.RegisterCommands<MadWorldCommand>();
             this.Commands.RegisterCommands<CustomIntroCommand>();
             this.Commands.RegisterCommands<EmoteCommands>();
+            this.Commands.SetHelpFormatter<HelpFormatter>();
             //this.Client.TypingStarted += Client_TypingStarted;
 
             // let's set up voice
