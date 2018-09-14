@@ -13,12 +13,13 @@ using NoiseBot.Commands.VoiceCommands.CustomVoiceCommands;
 using NoiseBot.Commands.VoiceCommands.VoiceRecognition;
 using NoiseBot.Exceptions;
 using NoiseBot.Extensions;
+using NoiseBot.Commands;
 
 namespace NoiseBot
 {
     class Program
     {
-        private static readonly SimpleLogger Logger = SimpleLogger.GetSimpleLogger();
+        private static readonly SimpleLogController Logger = SimpleLogController.GetSimpleLogger();
 
         public static DiscordClient Client { get; set; }
         public CommandsNextExtension Commands { get; set; }
@@ -136,6 +137,7 @@ namespace NoiseBot
             this.Commands.RegisterCommands<MadWorldCommand>();
             this.Commands.RegisterCommands<CustomIntroCommand>();
             this.Commands.RegisterCommands<EmoteCommands>();
+            this.Commands.RegisterCommands<RedditCommands>();
             this.Commands.SetHelpFormatter<HelpFormatter>();
             //this.Client.TypingStarted += Client_TypingStarted;
 
