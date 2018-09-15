@@ -17,7 +17,7 @@ namespace NoiseBot.Commands.RedditCommands
         private static RedditSubscriptionsFile instance;
 
 
-        [JsonProperty("CustomAudioCommands")]
+        [JsonProperty("RedditSubscriptions")]
         public ObservableCollection<RedditSubscriptionModel> RedditSubscriptions { get; private set; }
 
         public RedditSubscriptionsFile()
@@ -33,7 +33,10 @@ namespace NoiseBot.Commands.RedditCommands
 
         private void SaveFile()
         {
-            SerializationController.SerializeFile<RedditSubscriptionsFile>(instance, filepath);
+            lock (LockObject)
+            {
+                SerializationController.SerializeFile<RedditSubscriptionsFile>(instance, filepath);
+            }
         }
 
         /// <summary>
