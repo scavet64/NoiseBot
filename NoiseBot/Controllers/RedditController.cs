@@ -1,4 +1,4 @@
-using DSharpPlus.CommandsNext;
+﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using RedditSharp;
 using RedditSharp.Things;
@@ -14,6 +14,7 @@ namespace NoiseBot.Controllers
 {
     public static class RedditController
     {
+        private static readonly string redditPostFormat = "Post from `{0}` \n Reddit Link: https://reddit.com{1} \n {2}";
         private static Dictionary<RedditSubscriptionModel, bool> subscriptionToIsRunning = new Dictionary<RedditSubscriptionModel, bool>();
         private static readonly short maxNumberOfSubscriptions = 5; // Not sure if I want this yet
 
@@ -128,7 +129,7 @@ namespace NoiseBot.Controllers
 
                     // Get the guild and channel to then post the message
                     DiscordGuild guildToPostIn = await Program.Client.GetGuildAsync(subscription.DiscordGuildId);
-                    await guildToPostIn.GetChannel(subscription.ChannelId).SendMessageAsync(urlToPost);
+                    await guildToPostIn.GetChannel(subscription.ChannelId).SendMessageAsync(string.Format(redditPostFormat, subscription.Subreddit, post.Permalink.ToString(), urlToPost));
 
                     // add the post to the list so no repeats and save
                     subscription.PostedLinks.Add(urlToPost);
