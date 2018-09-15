@@ -33,9 +33,12 @@ namespace NoiseBot.Commands.RedditCommands
 
         private void SaveFile()
         {
-            lock (LockObject)
+            if (instance != null)
             {
-                SerializationController.SerializeFile<RedditSubscriptionsFile>(instance, filepath);
+                lock (LockObject)
+                {
+                    SerializationController.SerializeFile<RedditSubscriptionsFile>(instance, filepath);
+                }
             }
         }
 
