@@ -1,4 +1,4 @@
-using DSharpPlus.CommandsNext;
+﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using NoiseBot.Controllers;
 using NoiseBot.Extensions;
@@ -55,7 +55,63 @@ namespace NoiseBot.Commands.RedditCommands
                 return;
             }
 
-            RedditSubscriptionsFile.Instance.RemoveSubscription(subredditUrl, ctx.Guild.Id);
+            if(RedditController.RemoveSubscription(subredditUrl, ctx.Guild.Id))
+            {
+                await ctx.RespondAsync("Removed subscription :^)");
+            }
+        }
+
+        [Command("list"), Description("List of current reddit subscriptions")]
+        public async Task ListCurrentSubscriptions(CommandContext ctx)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            if (RedditSubscriptionsFile.Instance.RedditSubscriptions.Count > 0)
+            {
+                builder.Append("```");
+
+                foreach (RedditSubscriptionModel sub in RedditSubscriptionsFile.Instance.RedditSubscriptions)
+                {
+                    builder.Append("Subreddit: ").Append(sub.Subreddit).Append("\t\t").Append(" | requested by: ").AppendLine(sub.UserSubscribed);
+                }
+
+                builder.Append("```");
+            }
+            else
+            {
+                builder.Append("There are no subscriptions :^(");
+            }
+
+            await ctx.RespondAsync(builder.ToString());
+        }
+
+        [Command("interval"), Description("Update the interval for a subscription.")]
+        public async Task UpdateIntervalTimerForSubscription(CommandContext ctx, [Description("Subscription to update")] string subredditUrl, [Description("New polling interval in minutes")] int intervalMin)
+        {
+            if (string.IsNullOrWhiteSpace(subredditUrl))
+            {
+                await ctx.RespondAsync("You need to enter a subreddit to update :^(");
+                return;
+            }
+
+            if (intervalMin <= 0 || intervalMin > 1000000)
+            {
+                await ctx.RespondAsync("The polling interval must fall between 1 and 1000000 minutes :^(");
+                return;
+            }
+
+            if (RedditController.UpdateInterval(subredditUrl, ctx.Guild.Id, intervalMin))
+            {
+                await ctx.RespondAsync("Subscription Interval was updated :^)");
+                return;
+            }
+            else
+            {
+                await ctx.RespondAsync("Subscription interval was not updated. Are you sure it exists? :^(");
+                return;
+            }
+
+
         }
     }
 }
