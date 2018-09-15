@@ -15,6 +15,7 @@ using NoiseBot.Exceptions;
 using NoiseBot.Extensions;
 using NoiseBot.Commands;
 using NoiseBot.Commands.RedditCommands;
+using NoiseBot.Controllers;
 
 namespace NoiseBot
 {
@@ -157,6 +158,8 @@ namespace NoiseBot
 
             // for this example you will need to read the 
             // VoiceNext setup guide, and include ffmpeg.
+
+            RedditController.StartSubscriptionThreadsThread();
 
             // and this is to prevent premature quitting
             await Task.Delay(-1);

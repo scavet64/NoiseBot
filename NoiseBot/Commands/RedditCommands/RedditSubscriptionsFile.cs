@@ -12,7 +12,6 @@ namespace NoiseBot.Commands.RedditCommands
     {
         private static readonly string filepath = "RedditSubscriptions.json";
         private static readonly object LockObject = new object();
-        private static readonly short maxNumberOfSubscriptions = 5;
 
         private static RedditSubscriptionsFile instance;
 
@@ -31,7 +30,7 @@ namespace NoiseBot.Commands.RedditCommands
             SaveFile();
         }
 
-        private void SaveFile()
+        public void SaveFile()
         {
             if (instance != null)
             {

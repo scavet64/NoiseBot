@@ -8,16 +8,18 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using NoiseBot.Commands.RedditCommands;
+using NoiseBot.Extensions;
 
 namespace NoiseBot.Controllers
 {
     public static class RedditController
     {
         private static Dictionary<RedditSubscriptionModel, bool> subscriptionToIsRunning = new Dictionary<RedditSubscriptionModel, bool>();
+        private static readonly short maxNumberOfSubscriptions = 5; // Not sure if I want this yet
 
-        public static RedditSubscriptionModel AddNewSubscription(string subreddit, ulong guildId, ulong channelId, string username)
+        public static RedditSubscriptionModel AddNewSubscription(string subreddit, ulong guildId, ulong channelId, string username, int intervalMin)
         {
-            RedditSubscriptionModel model = new RedditSubscriptionModel(subreddit, guildId, channelId, username);
+            RedditSubscriptionModel model = new RedditSubscriptionModel(subreddit, guildId, channelId, username, intervalMin);
             RedditSubscriptionsFile.Instance.AddSubscription(model);
 
             // start the thread
@@ -28,17 +30,20 @@ namespace NoiseBot.Controllers
 
         public static bool RemoveSubscription(string subreddit, ulong guildId)
         {
+            bool wasRemoved = false;
             RedditSubscriptionModel model = RedditSubscriptionsFile.Instance.GetSubscriptionByIdAndUrl(subreddit, guildId);
             if (model != null)
             {
                 RedditSubscriptionsFile.Instance.RemoveSubscription(model);
 
                 // stop the thread from running.
-                subscriptionToIsRunning[model] = false;
+                subscriptionToIsRunning.Remove(model);
 
-                return true;
+                wasRemoved = true;
             }
-            else
+            return wasRemoved;
+        }
+
         public static bool UpdateInterval(string subreddit, ulong guildId, int newPollingInterval)
         {
             bool wasUpdated = false;
@@ -52,19 +57,44 @@ namespace NoiseBot.Controllers
             return wasUpdated;
         }
 
-        private static void StartSubscriptionThreads()
+        /// <summary>
+        /// Starts the subscription threads thread so that it will not block the main thread when its sleeps
+        /// </summary>
+        public static void StartSubscriptionThreadsThread()
         {
-            foreach(RedditSubscriptionModel model in RedditSubscriptionsFile.Instance.RedditSubscriptions)
+            var t = new Thread(() => StartSubscriptionThreadsWork())
+            {
+                Name = "Start Subscription Threads Thread"
+            };
+            t.Start();
+        }
+
+        public static void StartSubscriptionThreadsWork()
+        {
+            // Basically make a copy of the list just in case its modified during the staggered rollout
+            List<RedditSubscriptionModel> startingSubs = new List<RedditSubscriptionModel>();
+            foreach (RedditSubscriptionModel model in RedditSubscriptionsFile.Instance.RedditSubscriptions)
+            {
+                startingSubs.Add(model);
+            }
+
+            foreach (RedditSubscriptionModel model in startingSubs)
             {
                 SpawnThreadForSubscription(model);
+
+                //This will spread the subscription spam out
+                int secondsToSleep = new Random().Next(60);
+                Program.Client.DebugLogger.Info(string.Format("Sleeping for {0} seconds", secondsToSleep));
+                Thread.Sleep(new TimeSpan(0, 0, secondsToSleep));
             }
+            Program.Client.DebugLogger.Info(string.Format("Finished spawning threads"));
         }
 
         public static Thread SpawnThreadForSubscription(RedditSubscriptionModel subscription)
         {
             var t = new Thread(() => SubscriptionThreadMethod(subscription))
             {
-                Name = "SubscriptionThread - " + subscription.Subreddit
+                Name = subscription.Subreddit + " - SubscriptionThread"
             };
             t.Start();
             subscriptionToIsRunning.Add(subscription, true);
@@ -77,7 +107,7 @@ namespace NoiseBot.Controllers
             while (subscriptionToIsRunning.GetValueOrDefault(subscription, false))
             {
                 PostFromRedditAsync(subscription).Wait();
-                Thread.Sleep(new TimeSpan(0, 0, 30));
+                Thread.Sleep(new TimeSpan(0, subscription.IntervalMin, 0));
             }
         }
 
@@ -85,15 +115,24 @@ namespace NoiseBot.Controllers
         {
             var reddit = new Reddit();
             Subreddit subreddit = reddit.GetSubreddit(subscription.Subreddit);
-            Listing<Post> listings = subreddit.GetTop(FromTime.Hour);
-            foreach (Post post in listings.GetListing(10))
+            Listing<Post> listings = subreddit.GetTop(FromTime.Day);
+            Program.Client.DebugLogger.Info("Checking Posts from subreddit: " + subscription.Subreddit);
+            foreach (Post post in listings.GetListing(20))
             {
+
                 // See if one out of the ten posts are unique, if not, nothing will post
                 string urlToPost = post.Url.ToString();
-                if (!subscription.PostedLinks.Contains(urlToPost)) {
+                if (!subscription.PostedLinks.Contains(urlToPost))
+                {
+                    Program.Client.DebugLogger.Info("Posting URL: " + urlToPost);
+
+                    // Get the guild and channel to then post the message
                     DiscordGuild guildToPostIn = await Program.Client.GetGuildAsync(subscription.DiscordGuildId);
                     await guildToPostIn.GetChannel(subscription.ChannelId).SendMessageAsync(urlToPost);
+
+                    // add the post to the list so no repeats and save
                     subscription.PostedLinks.Add(urlToPost);
+                    RedditSubscriptionsFile.Instance.SaveFile();
                     break;
                 }
             }
