@@ -11,61 +11,11 @@ namespace NoiseBot.Commands.RedditCommands
         [JsonProperty("subreddit")]
         public string Subreddit { get; private set; }
 
-        private ulong discordGuildId;
-
-        [JsonIgnore]
-        public ulong DiscordGuildId
-        {
-            get
-            {
-                return discordGuildId;
-            }
-            set
-            {
-                discordGuildId = value;
-            }
-        }
-
         [JsonProperty("DiscordGuildId")]
-        public string DiscordGuildIdString
-        {
-            get
-            {
-                return discordGuildId.ToString();
-            }
-            set
-            {
-                discordGuildId = ulong.Parse(value);
-            }
-        }
-
-        private ulong channelId;
-
-        [JsonIgnore]
-        public ulong ChannelId
-        {
-            get
-            {
-                return channelId;
-            }
-            private set
-            {
-                channelId = value;
-            }
-        }
+        public ulong DiscordGuildId { get; set; }
 
         [JsonProperty("ChannelId")]
-        public string ChannelIdString
-        {
-            get
-            {
-                return channelId.ToString();
-            }
-            set
-            {
-                ChannelId = ulong.Parse(value);
-            }
-        }
+        public ulong ChannelId { get; set; }
 
         [JsonProperty("UserSubscribed")]
         public string UserSubscribed { get; private set; }
@@ -73,7 +23,9 @@ namespace NoiseBot.Commands.RedditCommands
         [JsonProperty("PostedLinks")]
         public List<string> PostedLinks { get; private set; }
 
-        public RedditSubscriptionModel() { }
+        public RedditSubscriptionModel() {
+            this.PostedLinks = new List<string>();
+        }
 
         public RedditSubscriptionModel(string subreddit, ulong DiscordGuildId, ulong channelId, string UserSubscribed)
         {
@@ -82,7 +34,6 @@ namespace NoiseBot.Commands.RedditCommands
             this.ChannelId = channelId;
             this.UserSubscribed = UserSubscribed;
             this.PostedLinks = new List<string>();
-            this.PostedLinks.Add("heh");
         }
     }
 }
