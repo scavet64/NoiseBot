@@ -14,6 +14,7 @@ using NoiseBot.Commands.VoiceCommands.VoiceRecognition;
 using NoiseBot.Exceptions;
 using NoiseBot.Extensions;
 using NoiseBot.Commands;
+using NoiseBot.Commands.RedditCommands;
 
 namespace NoiseBot
 {

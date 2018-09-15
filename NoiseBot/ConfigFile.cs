@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using NoiseBot.Controllers;
 using NoiseBot.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -42,27 +43,9 @@ namespace NoiseBot
                 throw new InvalidConfigException("Config file is missing");
             }
 
-            ConfigFile rVal;
+            ConfigFile rVal = SerializationController.DeserializeFile<ConfigFile>(ConfigFilePath);
 
-            try
-            {
-                using (var fs = File.OpenRead("config.json"))
-                {
-                    using (var sr = new StreamReader(fs, new UTF8Encoding(false)))
-                    {
-                        string json = sr.ReadToEnd();
-                        rVal = JsonConvert.DeserializeObject<ConfigFile>(json);
-                    }
-                }
-            }
-            catch (IOException ioex)
-            {
-                throw new InvalidConfigException("Could not read config file: " + ioex.Message);
-            }
-            catch (JsonException jex)
-            {
-                throw new InvalidConfigException("Config json was incorrectly formatted: " + jex.Message);
-            }
+            
 
             return rVal;
         }

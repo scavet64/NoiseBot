@@ -16,7 +16,7 @@ namespace NoiseBot.Controllers
             {
                 using (var fs = File.OpenRead(path))
                 {
-                    using (var sr = new StreamReader(fs, new UTF8Encoding(false)))
+                    using (var sr = new StreamReader(fs))
                     {
                         string json = sr.ReadToEnd();
                         rVal = JsonConvert.DeserializeObject<T>(json);
