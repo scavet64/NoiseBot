@@ -1,4 +1,4 @@
-﻿using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using RedditSharp;
 using RedditSharp.Things;
@@ -39,9 +39,17 @@ namespace NoiseBot.Controllers
                 return true;
             }
             else
+        public static bool UpdateInterval(string subreddit, ulong guildId, int newPollingInterval)
+        {
+            bool wasUpdated = false;
+            RedditSubscriptionModel model = RedditSubscriptionsFile.Instance.GetSubscriptionByIdAndUrl(subreddit, guildId);
+            if (model != null)
             {
-                return false;
+                model.IntervalMin = newPollingInterval;
+                RedditSubscriptionsFile.Instance.SaveFile();
+                wasUpdated = true;
             }
+            return wasUpdated;
         }
 
         private static void StartSubscriptionThreads()
