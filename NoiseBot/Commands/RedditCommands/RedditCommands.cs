@@ -1,5 +1,7 @@
 ﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using NoiseBot.Controllers;
+using NoiseBot.Extensions;
 using RedditSharp;
 using RedditSharp.Things;
 using System;
@@ -10,29 +12,43 @@ using System.Threading.Tasks;
 
 namespace NoiseBot.Commands.RedditCommands
 {
+    [Group("Reddit")]
     public class RedditCommands : BaseCommandModule
     {
-        [Command("RedditGo"), Description("Plays a custom audio command.")]
-        public async Task RedditGo(CommandContext ctx, [RemainingText, Description("Name of the command")] string customCommandName)
+        [Command("add"), Description("Adds a reddit subscription")]
+        public async Task AddRedditSubscription(CommandContext ctx, [RemainingText, Description("Subreddit to subscribe to (ex. /r/pics)")] string subredditUrl)
         {
-            var t = new Thread(() => IntroMethodThread(ctx));
-            t.Start();
+            try
+            {
+                if (string.IsNullOrWhiteSpace(subredditUrl))
+                {
+                    await ctx.RespondAsync("You need to enter a subreddit to subscribe too :^(");
+                    return;
+                }
+
+                if (RedditSubscriptionsFile.Instance.DoesSubExistForGuild(subredditUrl, ctx.Guild.Id))
+                {
+                    await ctx.RespondAsync("This Subreddit subscription already exists :^(");
+                    return;
+                }
+
+                RedditController.AddNewSubscription(subredditUrl, ctx.Guild.Id, ctx.Channel.Id, ctx.User.Username);
+            } catch (Exception ex)
+            {
+                Program.Client.DebugLogger.Error(ex.StackTrace);
+            }
         }
 
-        private void IntroMethodThread(CommandContext ctx)
+        [Command("remove"), Description("removes a reddit subscription")]
+        public async Task RemoveRedditSubscription(CommandContext ctx, [RemainingText, Description("Subreddit to remove")] string subredditUrl)
         {
-            while (true)
+            if (!RedditSubscriptionsFile.Instance.DoesSubExistForGuild(subredditUrl, ctx.Guild.Id))
             {
-                var reddit = new Reddit();
-                Subreddit subreddit = reddit.GetSubreddit("/r/RealGirls/");
-                Listing<Post> listings = subreddit.GetTop(FromTime.Hour;
-                foreach(Post post in listings.GetListing(1))
-                {
-                    ctx.RespondAsync(post.Url.ToString());
-                }
-                
-                Thread.Sleep(new TimeSpan(0, 0, 30));
+                await ctx.RespondAsync("This Subreddit subscription does not exists :^(");
+                return;
             }
+
+            RedditSubscriptionsFile.Instance.RemoveSubscription(subredditUrl, ctx.Guild.Id);
         }
     }
 }
