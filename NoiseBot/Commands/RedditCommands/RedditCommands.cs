@@ -202,31 +202,6 @@ namespace NoiseBot.Commands.RedditCommands
                     Program.Client.DebugLogger.Error(ex.StackTrace);
                 }
             }
-
-            [Command("test"), Description("returns a list of all the notifications for this user")]
-            public async Task RandomRedditNotification(CommandContext ctx)
-            {
-                try
-                {
-                    List<PersonalRedditNotification> notificationsForUser = RedditSubscriptionsFile.Instance.GetRedditNotificationsForUser(ctx.User);
-                    StringBuilder builder = new StringBuilder();
-
-                    if (notificationsForUser.Count > 0)
-                    {
-
-                    }
-                    else
-                    {
-                        builder.Append("There are no notifications :^(");
-                    }
-
-                    await ctx.RespondAsync(RedditSubscriptionsFile.Instance.PersonalRedditSubscriptions[new Random().Next(RedditSubscriptionsFile.Instance.PersonalRedditSubscriptions.Count)].UserMentionString);
-                }
-                catch (Exception ex)
-                {
-                    Program.Client.DebugLogger.Error(ex.StackTrace);
-                }
-            }
         }
     }
 }
