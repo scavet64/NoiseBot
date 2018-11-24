@@ -40,7 +40,8 @@ namespace NoiseBot.Commands.RedditCommands
 
                 RedditController.AddNewSubscription(subredditUrl, ctx.Guild.Id, ctx.Channel.Id, ctx.User.Username, intervalMin);
                 await ctx.RespondAsync("Successfully added subscription :^)");
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Program.Client.DebugLogger.Error(ex.StackTrace);
             }
@@ -55,7 +56,7 @@ namespace NoiseBot.Commands.RedditCommands
                 return;
             }
 
-            if(RedditController.RemoveSubscription(subredditUrl, ctx.Guild.Id))
+            if (RedditController.RemoveSubscription(subredditUrl, ctx.Guild.Id))
             {
                 await ctx.RespondAsync("Removed subscription :^)");
             }
@@ -110,8 +111,122 @@ namespace NoiseBot.Commands.RedditCommands
                 await ctx.RespondAsync("Subscription interval was not updated. Are you sure it exists? :^(");
                 return;
             }
+        }
 
+        //Inner class for nested groups
+        [Group("notify")]
+        public class NotificationCommands : BaseCommandModule
+        {
 
+            [Command("add"), Description("Adds a notification to the user when the keyword is found in the reddit post")]
+            public async Task AddRedditNotification(CommandContext ctx, [RemainingText, Description("The keyword")] string keyword)
+            {
+                try
+                {
+                    if (string.IsNullOrWhiteSpace(keyword))
+                    {
+                        await ctx.RespondAsync("The keyword cannot be empty :^(");
+                        return;
+                    }
+
+                    if (RedditSubscriptionsFile.Instance.AddPersonalNotification(
+                        new PersonalRedditNotification(ctx.User.Mention, keyword)))
+                    {
+                        await ctx.RespondAsync("Successfully added notification :^)");
+                    }
+                    else
+                    {
+                        await ctx.RespondAsync("This Subreddit subscription already exists :^(");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Program.Client.DebugLogger.Error(ex.StackTrace);
+                }
+            }
+
+            [Command("remove"), Description("Adds a notification to the user when the keyword is found in the reddit post")]
+            public async Task RemoveRedditNotification(CommandContext ctx, [RemainingText, Description("The keyword")] string keyword)
+            {
+                try
+                {
+                    if (string.IsNullOrWhiteSpace(keyword))
+                    {
+                        await ctx.RespondAsync("The keyword cannot be empty :^(");
+                        return;
+                    }
+
+                    if (RedditSubscriptionsFile.Instance.RemovePersonalNotification(new PersonalRedditNotification(ctx.User.Mention, keyword)))
+                    {
+                        await ctx.RespondAsync("Successfully removed notification :^)");
+                    }
+                    else
+                    {
+                        await ctx.RespondAsync("This Subreddit subscription already exists :^(");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Program.Client.DebugLogger.Error(ex.StackTrace);
+                }
+            }
+
+            [Command("list"), Description("returns a list of all the notifications for this user")]
+            public async Task ListRedditNotification(CommandContext ctx)
+            {
+                try
+                {
+                    List<PersonalRedditNotification> notificationsForUser = RedditSubscriptionsFile.Instance.GetRedditNotificationsForUser(ctx.User);
+                    StringBuilder builder = new StringBuilder();
+
+                    if (notificationsForUser.Count > 0)
+                    {
+                        builder.Append("```");
+
+                        foreach (PersonalRedditNotification sub in notificationsForUser)
+                        {
+                            builder.Append("Keyword: ").AppendLine(sub.SubscribedKeyword);
+                        }
+
+                        builder.Append("```");
+                    }
+                    else
+                    {
+                        builder.Append("You dont have any notifications :^(");
+                    }
+
+                    await ctx.RespondAsync(builder.ToString());
+                }
+                catch (Exception ex)
+                {
+                    Program.Client.DebugLogger.Error(ex.StackTrace);
+                }
+            }
+
+            [Command("test"), Description("returns a list of all the notifications for this user")]
+            public async Task RandomRedditNotification(CommandContext ctx)
+            {
+                try
+                {
+                    List<PersonalRedditNotification> notificationsForUser = RedditSubscriptionsFile.Instance.GetRedditNotificationsForUser(ctx.User);
+                    StringBuilder builder = new StringBuilder();
+
+                    if (notificationsForUser.Count > 0)
+                    {
+
+                    }
+                    else
+                    {
+                        builder.Append("There are no notifications :^(");
+                    }
+
+                    await ctx.RespondAsync(RedditSubscriptionsFile.Instance.PersonalRedditSubscriptions[new Random().Next(RedditSubscriptionsFile.Instance.PersonalRedditSubscriptions.Count)].UserMentionString);
+                }
+                catch (Exception ex)
+                {
+                    Program.Client.DebugLogger.Error(ex.StackTrace);
+                }
+            }
         }
     }
 }

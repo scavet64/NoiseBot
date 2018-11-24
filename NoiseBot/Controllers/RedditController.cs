@@ -4,6 +4,7 @@ using RedditSharp;
 using RedditSharp.Things;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
@@ -14,7 +15,7 @@ namespace NoiseBot.Controllers
 {
     public static class RedditController
     {
-        private static readonly string redditPostFormat = "Post from `{0}` \n Reddit Link: https://reddit.com{1} \n {2}";
+        private static readonly string redditPostFormat = "{0}\nPost from `{1}` \nReddit Link: https://reddit.com{2} \n{3}";
         private static Dictionary<RedditSubscriptionModel, bool> subscriptionToIsRunning = new Dictionary<RedditSubscriptionModel, bool>();
         private static readonly short maxNumberOfSubscriptions = 5; // Not sure if I want this yet
 
@@ -114,28 +115,44 @@ namespace NoiseBot.Controllers
 
         private static async Task PostFromRedditAsync(RedditSubscriptionModel subscription)
         {
-            var reddit = new Reddit();
-            Subreddit subreddit = reddit.GetSubreddit(subscription.Subreddit);
-            Listing<Post> listings = subreddit.GetTop(FromTime.Day);
-            Program.Client.DebugLogger.Info("Checking Posts from subreddit: " + subscription.Subreddit);
-            foreach (Post post in listings.GetListing(20))
+            try
             {
-
-                // See if one out of the ten posts are unique, if not, nothing will post
-                string urlToPost = post.Url.ToString();
-                if (!subscription.PostedLinks.Contains(urlToPost))
+                var reddit = new Reddit();
+                Subreddit subreddit = reddit.GetSubreddit(subscription.Subreddit);
+                Listing<Post> listings = subreddit.Hot;
+                Program.Client.DebugLogger.Info("Checking Posts from subreddit: " + subscription.Subreddit);
+                foreach (Post post in listings.GetListing(15))
                 {
-                    Program.Client.DebugLogger.Info("Posting URL: " + urlToPost);
 
-                    // Get the guild and channel to then post the message
-                    DiscordGuild guildToPostIn = await Program.Client.GetGuildAsync(subscription.DiscordGuildId);
-                    await guildToPostIn.GetChannel(subscription.ChannelId).SendMessageAsync(string.Format(redditPostFormat, subscription.Subreddit, post.Permalink.ToString(), urlToPost));
+                    // See if one out of the ten posts are unique, if not, nothing will post
+                    string urlToPost = post.Url.ToString();
+                    if (!subscription.PostedLinks.Contains(urlToPost))
+                    {
+                        Program.Client.DebugLogger.Info("Posting URL: " + urlToPost);
 
-                    // add the post to the list so no repeats and save
-                    subscription.PostedLinks.Add(urlToPost);
-                    RedditSubscriptionsFile.Instance.SaveFile();
-                    break;
+                        // Get the guild and channel to then post the message
+                        DiscordGuild guildToPostIn = await Program.Client.GetGuildAsync(subscription.DiscordGuildId);
+                        await guildToPostIn.GetChannel(subscription.ChannelId).SendMessageAsync(string.Format(redditPostFormat, post.Title, subscription.Subreddit, post.Permalink.ToString(), urlToPost));
+
+                        //Notify users if keyword is triggered
+                        foreach (PersonalRedditNotification notification in RedditSubscriptionsFile.Instance.PersonalRedditSubscriptions)
+                        {
+                            if (post.Title.ToLower().Contains(notification.SubscribedKeyword.ToLower()))
+                            {
+                                await guildToPostIn.GetChannel(subscription.ChannelId).SendMessageAsync($"Keyword `{notification.SubscribedKeyword}` was triggered for {notification.UserMentionString}");
+                            }
+                        }
+
+                        // add the post to the list so no repeats and save
+                        subscription.PostedLinks.Add(urlToPost);
+                        RedditSubscriptionsFile.Instance.SaveFile();
+                        break;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Program.Client.DebugLogger.Critical(ex.StackTrace.ToString());
             }
         }
     }
