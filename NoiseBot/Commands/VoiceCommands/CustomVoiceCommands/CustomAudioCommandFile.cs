@@ -82,7 +82,10 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
 
         private void CustomAudioCommands_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            SaveFile();
+            if (instance != null)
+            {
+                SaveFile();
+            }
         }
 
         /// <summary>

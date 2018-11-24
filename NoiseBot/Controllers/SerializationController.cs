@@ -31,6 +31,10 @@ namespace NoiseBot.Controllers
             {
                 throw new InvalidConfigException("settings file incorrectly formatted: " + jex.Message);
             }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
             return rVal;
         }
 
