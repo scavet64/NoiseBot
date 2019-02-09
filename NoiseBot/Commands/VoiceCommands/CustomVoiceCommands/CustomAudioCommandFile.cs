@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using NoiseBot.Controllers;
 using NoiseBot.Exceptions;
 using NoiseBot.Extensions;
 using System;
@@ -64,29 +65,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
                 return instance;
             }
 
-            CustomAudioCommandFile rVal;
-
-            try
-            {
-                using (var fs = File.OpenRead(filePath))
-                {
-                    using (var sr = new StreamReader(fs, new UTF8Encoding(false)))
-                    {
-                        string json = sr.ReadToEnd();
-                        rVal = JsonConvert.DeserializeObject<CustomAudioCommandFile>(json);
-                    }
-                }
-            }
-            catch (IOException ioex)
-            {
-                throw new InvalidConfigException("Could not read config file: " + ioex.Message);
-            }
-            catch (JsonException jex)
-            {
-                throw new InvalidConfigException("Config json was incorrectly formatted: " + jex.Message);
-            }
-
-            return rVal;
+            return SerializationController.DeserializeFile<CustomAudioCommandFile>(filePath);
         }
 
         [JsonProperty("CustomAudioCommands")]
@@ -103,7 +82,10 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
 
         private void CustomAudioCommands_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            SaveFile();
+            if (instance != null)
+            {
+                SaveFile();
+            }
         }
 
         /// <summary>
@@ -209,17 +191,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
 
         private void SaveFile()
         {
-            if (instance != null)
-            {
-                lock (instance)
-                {
-                    using (StreamWriter file = File.CreateText(CustomAudioJsonFile))
-                    {
-                        JsonSerializer serializer = new JsonSerializer();
-                        serializer.Serialize(file, Instance);
-                    }
-                }
-            }
+            SerializationController.SerializeFile<CustomAudioCommandFile>(Instance, CustomAudioJsonFile);
         }
 
         /// <summary>
