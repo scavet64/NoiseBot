@@ -5,11 +5,13 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using DSharpPlus.Interactivity;
 using DSharpPlus.VoiceNext;
 using DSharpPlus.VoiceNext.Codec;
 using NoiseBot.Commands.VoiceCommands;
 using NoiseBot.Commands.VoiceCommands.CustomIntroCommands;
 using NoiseBot.Commands.VoiceCommands.CustomVoiceCommands;
+using NoiseBot.Commands.VoiceCommands.GameBotCommands;
 using NoiseBot.Commands.VoiceCommands.VoiceRecognition;
 using NoiseBot.Exceptions;
 using NoiseBot.Extensions;
@@ -69,6 +71,7 @@ namespace NoiseBot
                 // load settings then we want to instantiate our client
                 DiscordConfiguration discordConfiguration = GetConfigFromJsonSettings();
                 Client = new DiscordClient(discordConfiguration);
+                Client.UseInteractivity(new InteractivityConfiguration());
             }
             catch (InvalidConfigException ice)
             {
@@ -141,6 +144,7 @@ namespace NoiseBot
             this.Commands.RegisterCommands<EmoteCommands>();
             this.Commands.RegisterCommands<RedditCommands>();
             this.Commands.SetHelpFormatter<HelpFormatter>();
+            this.Commands.RegisterCommands<GameListCommand>();
             //this.Client.TypingStarted += Client_TypingStarted;
 
             // let's set up voice
