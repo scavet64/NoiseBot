@@ -13,12 +13,15 @@ using NoiseBot.Commands.VoiceCommands.CustomVoiceCommands;
 using NoiseBot.Commands.VoiceCommands.VoiceRecognition;
 using NoiseBot.Exceptions;
 using NoiseBot.Extensions;
+using NoiseBot.Commands;
+using NoiseBot.Commands.RedditCommands;
+using NoiseBot.Controllers;
 
 namespace NoiseBot
 {
     class Program
     {
-        private static readonly SimpleLogger Logger = SimpleLogger.GetSimpleLogger();
+        private static readonly SimpleLogController Logger = SimpleLogController.GetSimpleLogger();
 
         public static DiscordClient Client { get; set; }
         public CommandsNextExtension Commands { get; set; }
@@ -136,6 +139,7 @@ namespace NoiseBot
             this.Commands.RegisterCommands<MadWorldCommand>();
             this.Commands.RegisterCommands<CustomIntroCommand>();
             this.Commands.RegisterCommands<EmoteCommands>();
+            this.Commands.RegisterCommands<RedditCommands>();
             this.Commands.SetHelpFormatter<HelpFormatter>();
             //this.Client.TypingStarted += Client_TypingStarted;
 
@@ -154,6 +158,8 @@ namespace NoiseBot
 
             // for this example you will need to read the 
             // VoiceNext setup guide, and include ffmpeg.
+
+            RedditController.StartSubscriptionThreadsThread();
 
             // and this is to prevent premature quitting
             await Task.Delay(-1);
