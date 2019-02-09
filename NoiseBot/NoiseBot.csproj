@@ -12,6 +12,7 @@
     <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-beta-00467" />
     <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-beta-00467" />
     <PackageReference Include="DSharpPlus.VoiceNext" Version="4.0.0-beta-00467" />
+    <PackageReference Include="RedditSharp" Version="1.1.14" />
   </ItemGroup>
 
   <ItemGroup>

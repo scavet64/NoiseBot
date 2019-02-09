@@ -10,11 +10,11 @@ namespace NoiseBot
     /// <summary>
     /// Simple logger class
     /// </summary>
-    public class SimpleLogger
+    public class SimpleLogController
     {
         //private static readonly Settings Settings = Settings.Default;
         private static readonly object Lock = new object();
-        private static SimpleLogger instance;
+        private static SimpleLogController instance;
 
         private readonly string datetimeFormat;
 
@@ -30,7 +30,7 @@ namespace NoiseBot
         /// Gets the simple logger instance
         /// </summary>
         /// <returns>singleton instance of the simple logger</returns>
-        public static SimpleLogger GetSimpleLogger()
+        public static SimpleLogController GetSimpleLogger()
         {
             if (instance == null)
             {
@@ -38,7 +38,7 @@ namespace NoiseBot
                 {
                     if (instance == null)
                     {
-                        instance = new SimpleLogger(true);
+                        instance = new SimpleLogController(true);
                     }
                 }
             }
@@ -106,7 +106,7 @@ namespace NoiseBot
         /// Default is create a fresh new log file.
         /// </summary>
         /// <param name="append">True to append to existing log file, False to overwrite and create new log file</param>
-        private SimpleLogger(bool append = false)
+        private SimpleLogController(bool append = false)
         {
             datetimeFormat = "yyyy-MM-dd HH:mm:ss.fff";
             Filename = GetExecutingDirectory() + Assembly.GetExecutingAssembly().GetName().Name + "_" + GetCurrentDateString() + ".log";
