@@ -120,7 +120,7 @@ namespace NoiseBot.Controllers
                 var reddit = new Reddit();
                 Subreddit subreddit = reddit.GetSubreddit(subscription.Subreddit);
                 Listing<Post> listings = subreddit.Hot;
-                Program.Client.DebugLogger.Info("Checking Posts from subreddit: " + subscription.Subreddit);
+                //Program.Client.DebugLogger.Info("Checking Posts from subreddit: " + subscription.Subreddit);
                 foreach (Post post in listings.GetListing(15))
                 {
 
@@ -128,7 +128,7 @@ namespace NoiseBot.Controllers
                     string urlToPost = post.Url.ToString();
                     if (!subscription.PostedLinks.Contains(urlToPost))
                     {
-                        Program.Client.DebugLogger.Info("Posting URL: " + urlToPost);
+                        Program.Client.DebugLogger.Info("Posting URL: " + urlToPost + " From: " + subscription.Subreddit);
 
                         // Get the guild and channel to then post the message
                         DiscordGuild guildToPostIn = await Program.Client.GetGuildAsync(subscription.DiscordGuildId);
