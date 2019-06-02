@@ -18,9 +18,11 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
     {
         //private List<DiscordUser> users = new List<DiscordUser>();
         private static readonly object LockObject = new object();
-        private bool isDoingIntros = false;
+        private bool _isDoingIntros = false;
+        private bool _isDoingOutros= false;
 
         BlockingCollection<IntroQueueElement> introQueue = new BlockingCollection<IntroQueueElement>();
+        BlockingCollection<IntroQueueElement> outroQueue = new BlockingCollection<IntroQueueElement>();
 
         private class IntroQueueElement
         {
@@ -32,10 +34,14 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
         public CustomIntroCommand()
         {
             Program.Client.VoiceStateUpdated += Client_VoiceStateUpdated;
-            isDoingIntros = true;
+            _isDoingIntros = true;
+            _isDoingOutros = true;
 
             var t = new Thread(() => IntroMethodThread());
             t.Start();
+
+            var o = new Thread(() => OutroMethodThread());
+            o.Start();
         }
 
         private Task Client_VoiceStateUpdated(VoiceStateUpdateEventArgs e)
@@ -70,6 +76,15 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
                     }
                     else if (e.After.Channel == null && e.Before.Channel != null)
                     {
+                        IntroQueueElement introQueueElement = new IntroQueueElement
+                        {
+                            NewUser = e.User,
+                            ChannelToJoin = e.Before.Channel,
+                            GuildToJoin = e.After.Guild
+                        };
+
+                        outroQueue.Add(introQueueElement);
+
                         e.Client.DebugLogger.LogMessage(LogLevel.Debug, "NoiseBot", string.Format("{0} left channel {1}", e.User.Username, e.Before.Channel.Name), DateTime.Now);
                     }
                 }
@@ -84,10 +99,10 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
         [Command("StartIntro"), Description("Start doing intros"), RequirePermissions(DSharpPlus.Permissions.Administrator)]
         public async Task StartIntro(CommandContext ctx)
         {
-            if (!isDoingIntros)
+            if (!_isDoingIntros)
             {
                 ctx.Client.VoiceStateUpdated += Client_VoiceStateUpdated;
-                isDoingIntros = true;
+                _isDoingIntros = true;
 
                 await ctx.RespondAsync("I will now introduce people as they join voice chat");
                 var t = new Thread(() => IntroMethodThread());
@@ -104,7 +119,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
         public Task StopIntro(CommandContext ctx)
         {
             ctx.Client.VoiceStateUpdated += NullVoiceStateUpdateHandler;
-            isDoingIntros = false;
+            _isDoingIntros = false;
             return Task.CompletedTask;
         }
 
@@ -115,10 +130,10 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
 
         private void IntroMethodThread()
         {
-            while (isDoingIntros)
+            while (_isDoingIntros)
             {
                 IntroQueueElement introQueueElement = introQueue.Take();
-                if (isDoingIntros)
+                if (_isDoingIntros)
                 {
                     CustomIntroModel introModel = CustomIntroFile.Instance.GetIntroForUsername(introQueueElement.NewUser.Username);
                     string filepath;
@@ -132,6 +147,31 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
                         Program.Client.DebugLogger.Warn(string.Format("No intro was found for {0}. Using default", introQueueElement.NewUser.Username));
                         filepath = @"AudioFiles\fuckyou.mp3";
                     }
+
+                    AudioController.Instance.AddAudioToQueue(filepath, introQueueElement.ChannelToJoin, introQueueElement.GuildToJoin);
+                }
+            }
+        }
+
+        private void OutroMethodThread()
+        {
+            while (_isDoingOutros)
+            {
+                IntroQueueElement introQueueElement = outroQueue.Take();
+                if (_isDoingOutros)
+                {
+                    //CustomIntroModel introModel = CustomIntroFile.Instance.GetIntroForUsername(introQueueElement.NewUser.Username);
+                    string filepath = filepath = @"AudioFiles\disconnected.mp3";
+                    //if (introModel != null)
+                    //{
+                    //    Program.Client.DebugLogger.Info(string.Format("Playing {0} for {1}", introModel.Filepath, introQueueElement.NewUser.Username));
+                    //    filepath = introModel.Filepath;
+                    //}
+                    //else
+                    //{
+                    //    Program.Client.DebugLogger.Warn(string.Format("No intro was found for {0}. Using default", introQueueElement.NewUser.Username));
+                    //    filepath = @"AudioFiles\disconnected.mp3";
+                    //}
 
                     AudioController.Instance.AddAudioToQueue(filepath, introQueueElement.ChannelToJoin, introQueueElement.GuildToJoin);
                 }

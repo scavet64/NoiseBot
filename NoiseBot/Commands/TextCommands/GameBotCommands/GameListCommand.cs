@@ -44,6 +44,7 @@ namespace NoiseBot.Commands.VoiceCommands.GameBotCommands
         public async Task GameList(CommandContext ctx)
         {
             var games = GameListFile.Instance.GetAllGames();
+            games.Sort();
 
             string content = string.Empty;
             foreach (string game in games)
