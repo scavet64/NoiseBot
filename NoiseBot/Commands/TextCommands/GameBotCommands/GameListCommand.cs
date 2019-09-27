@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +14,14 @@ namespace NoiseBot.Commands.VoiceCommands.GameBotCommands
 {
     public class GameListCommand : BaseCommandModule
     {
+        [Command("GameSlots"), Description("Selects a random game like a slot machine")]
+        public async Task AddGame(CommandContext ctx)
+        {
+            Random rng = new Random();
+            var games = GameListFile.Instance.GetAllGames();
+            await ctx.RespondAsync($"Play {games[rng.Next(games.Count)]}.");
+        }
+
         [Command("AddGame"), Description("Adds a game to the game list.")]
         public async Task AddGame(CommandContext ctx, [RemainingText, Description("Name of the command")] string game)
         {
