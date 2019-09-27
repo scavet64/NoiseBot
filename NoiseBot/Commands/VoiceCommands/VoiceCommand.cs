@@ -39,10 +39,7 @@ namespace NoiseBot.Commands.VoiceCommands
             }
 
             // channel not specified, use user's
-            if (chn == null)
-            {
-                chn = vstat.Channel;
-            }
+            chn = chn == null ? vstat.Channel : chn;
 
             // connect
             try
@@ -75,16 +72,7 @@ namespace NoiseBot.Commands.VoiceCommands
                 return false;
             }
 
-            var vnc = vnext.GetConnection(context.Guild);
-            if (vnc != null)
-            {
-                // already connected since connection is not null
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return vnext.GetConnection(context.Guild) != null;
         }
 
         /// <summary>

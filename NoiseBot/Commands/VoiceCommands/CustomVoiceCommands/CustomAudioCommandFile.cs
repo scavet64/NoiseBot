@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using NoiseBot.Controllers;
+using NoiseBot.Services;
 using NoiseBot.Exceptions;
 using NoiseBot.Extensions;
 using System;
@@ -65,7 +65,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
                 return instance;
             }
 
-            return SerializationController.DeserializeFile<CustomAudioCommandFile>(filePath);
+            return SerializationService.DeserializeFile<CustomAudioCommandFile>(filePath);
         }
 
         [JsonProperty("CustomAudioCommands")]
@@ -191,7 +191,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
 
         private void SaveFile()
         {
-            SerializationController.SerializeFile<CustomAudioCommandFile>(Instance, CustomAudioJsonFile);
+            SerializationService.SerializeFile<CustomAudioCommandFile>(Instance, CustomAudioJsonFile);
         }
 
         /// <summary>

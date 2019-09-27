@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using NoiseBot.Controllers;
+using NoiseBot.Services;
 using NoiseBot.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -43,7 +43,7 @@ namespace NoiseBot
                 throw new InvalidConfigException("Config file is missing");
             }
 
-            ConfigFile rVal = SerializationController.DeserializeFile<ConfigFile>(ConfigFilePath);
+            ConfigFile rVal = SerializationService.DeserializeFile<ConfigFile>(ConfigFilePath);
 
             
 

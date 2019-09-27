@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using NoiseBot.Controllers;
+using NoiseBot.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -43,7 +43,7 @@ namespace NoiseBot.Commands.RedditCommands
             {
                 lock (LockObject)
                 {
-                    SerializationController.SerializeFile<RedditSubscriptionsFile>(instance, filepath);
+                    SerializationService.SerializeFile<RedditSubscriptionsFile>(instance, filepath);
                 }
             }
         }
@@ -92,7 +92,7 @@ namespace NoiseBot.Commands.RedditCommands
                 return instance;
             }
 
-            return SerializationController.DeserializeFile<RedditSubscriptionsFile>(filepath);
+            return SerializationService.DeserializeFile<RedditSubscriptionsFile>(filepath);
         }
 
         public bool AddSubscription(RedditSubscriptionModel model)

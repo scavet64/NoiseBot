@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace NoiseBot.Controllers
+namespace NoiseBot.Services
 {
-    class SerializationController
+    class SerializationService
     {
         public static T DeserializeFile<T>(string path)
         {

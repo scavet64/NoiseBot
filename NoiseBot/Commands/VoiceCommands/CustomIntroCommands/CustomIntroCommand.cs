@@ -4,7 +4,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using NoiseBot.Commands.VoiceCommands.CustomVoiceCommands;
-using NoiseBot.Controllers;
+using NoiseBot.Services;
 using NoiseBot.Extensions;
 using System;
 using System.Collections.Concurrent;
@@ -148,7 +148,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
                         filepath = @"AudioFiles\fuckyou.mp3";
                     }
 
-                    AudioController.Instance.AddAudioToQueue(filepath, introQueueElement.ChannelToJoin, introQueueElement.GuildToJoin);
+                    AudioService.Instance.AddAudioToQueue(filepath, introQueueElement.ChannelToJoin, introQueueElement.GuildToJoin);
                 }
             }
         }
@@ -173,7 +173,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
                     //    filepath = @"AudioFiles\disconnected.mp3";
                     //}
 
-                    AudioController.Instance.AddAudioToQueue(filepath, introQueueElement.ChannelToJoin, introQueueElement.GuildToJoin);
+                    AudioService.Instance.AddAudioToQueue(filepath, introQueueElement.ChannelToJoin, introQueueElement.GuildToJoin);
                 }
             }
         }

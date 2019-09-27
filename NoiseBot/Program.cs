@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -17,13 +17,13 @@ using NoiseBot.Exceptions;
 using NoiseBot.Extensions;
 using NoiseBot.Commands;
 using NoiseBot.Commands.RedditCommands;
-using NoiseBot.Controllers;
+using NoiseBot.Services;
 
 namespace NoiseBot
 {
     class Program
     {
-        private static readonly SimpleLogController Logger = SimpleLogController.GetSimpleLogger();
+        private static readonly SimpleLogService Logger = SimpleLogService.GetSimpleLogger();
 
         public static DiscordClient Client { get; set; }
         public CommandsNextExtension Commands { get; set; }
@@ -135,11 +135,8 @@ namespace NoiseBot
             // up next, let's register our commands
             this.Commands.RegisterCommands<VoiceCommand>();
             this.Commands.RegisterCommands<PlayAudioCommand>();
-            this.Commands.RegisterCommands<WormsCommand>();
             this.Commands.RegisterCommands<VoiceRecognition>();
-            this.Commands.RegisterCommands<FuckYouCommand>();
             this.Commands.RegisterCommands<CustomAudioCommand>();
-            this.Commands.RegisterCommands<MadWorldCommand>();
             this.Commands.RegisterCommands<CustomIntroCommand>();
             this.Commands.RegisterCommands<EmoteCommands>();
             this.Commands.RegisterCommands<RedditCommands>();
@@ -163,7 +160,7 @@ namespace NoiseBot
             // for this example you will need to read the 
             // VoiceNext setup guide, and include ffmpeg.
 
-            RedditController.StartSubscriptionThreadsThread();
+            RedditService.StartSubscriptionThreadsThread();
 
             // and this is to prevent premature quitting
             await Task.Delay(-1);

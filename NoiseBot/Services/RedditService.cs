@@ -11,9 +11,9 @@ using System.Threading;
 using NoiseBot.Commands.RedditCommands;
 using NoiseBot.Extensions;
 
-namespace NoiseBot.Controllers
+namespace NoiseBot.Services
 {
-    public static class RedditController
+    public static class RedditService
     {
         private static readonly string redditPostFormat = "{0}\nPost from `{1}` \nReddit Link: https://reddit.com{2} \n{3}";
         private static Dictionary<RedditSubscriptionModel, bool> subscriptionToIsRunning = new Dictionary<RedditSubscriptionModel, bool>();

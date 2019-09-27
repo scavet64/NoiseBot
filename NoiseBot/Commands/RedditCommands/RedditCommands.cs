@@ -1,6 +1,6 @@
 ﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using NoiseBot.Controllers;
+using NoiseBot.Services;
 using NoiseBot.Extensions;
 using RedditSharp;
 using RedditSharp.Things;
@@ -38,7 +38,7 @@ namespace NoiseBot.Commands.RedditCommands
                     return;
                 }
 
-                RedditController.AddNewSubscription(subredditUrl, ctx.Guild.Id, ctx.Channel.Id, ctx.User.Username, intervalMin);
+                RedditService.AddNewSubscription(subredditUrl, ctx.Guild.Id, ctx.Channel.Id, ctx.User.Username, intervalMin);
                 await ctx.RespondAsync("Successfully added subscription :^)");
             }
             catch (Exception ex)
@@ -56,7 +56,7 @@ namespace NoiseBot.Commands.RedditCommands
                 return;
             }
 
-            if (RedditController.RemoveSubscription(subredditUrl, ctx.Guild.Id))
+            if (RedditService.RemoveSubscription(subredditUrl, ctx.Guild.Id))
             {
                 await ctx.RespondAsync("Removed subscription :^)");
             }
@@ -101,7 +101,7 @@ namespace NoiseBot.Commands.RedditCommands
                 return;
             }
 
-            if (RedditController.UpdateInterval(subredditUrl, ctx.Guild.Id, intervalMin))
+            if (RedditService.UpdateInterval(subredditUrl, ctx.Guild.Id, intervalMin))
             {
                 await ctx.RespondAsync("Subscription Interval was updated :^)");
                 return;

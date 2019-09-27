@@ -13,16 +13,16 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NoiseBot.Controllers
+namespace NoiseBot.Services
 {
     /// <summary>
     /// Audio controller. This class is responsible for managing and playing any audio into the server.
     /// </summary>
-    public class AudioController
+    public class AudioService
     {
         private static object lockingObject = new object();
 
-        private static AudioController instance;
+        private static AudioService instance;
 
         /// <summary>
         /// Gets or sets the singleton instance.
@@ -30,7 +30,7 @@ namespace NoiseBot.Controllers
         /// <value>
         /// The instance.
         /// </value>
-        public static AudioController Instance
+        public static AudioService Instance
         {
             get
             {
@@ -40,7 +40,7 @@ namespace NoiseBot.Controllers
                     {
                         if (instance == null)
                         {
-                            instance = new AudioController();
+                            instance = new AudioService();
                         }
                     }
                 }
@@ -58,7 +58,7 @@ namespace NoiseBot.Controllers
             public DiscordGuild GuildToJoin { get; set; }
         }
 
-        private AudioController()
+        private AudioService()
         {
             var t = new Thread(() => AudioPlayingThread());
             t.Start();

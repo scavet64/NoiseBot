@@ -5,16 +5,16 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-namespace NoiseBot
+namespace NoiseBot.Services
 {
     /// <summary>
     /// Simple logger class
     /// </summary>
-    public class SimpleLogController
+    public class SimpleLogService
     {
         //private static readonly Settings Settings = Settings.Default;
         private static readonly object Lock = new object();
-        private static SimpleLogController instance;
+        private static SimpleLogService instance;
 
         private readonly string datetimeFormat;
 
@@ -30,7 +30,7 @@ namespace NoiseBot
         /// Gets the simple logger instance
         /// </summary>
         /// <returns>singleton instance of the simple logger</returns>
-        public static SimpleLogController GetSimpleLogger()
+        public static SimpleLogService GetSimpleLogger()
         {
             if (instance == null)
             {
@@ -38,7 +38,7 @@ namespace NoiseBot
                 {
                     if (instance == null)
                     {
-                        instance = new SimpleLogController(true);
+                        instance = new SimpleLogService(true);
                     }
                 }
             }
@@ -106,7 +106,7 @@ namespace NoiseBot
         /// Default is create a fresh new log file.
         /// </summary>
         /// <param name="append">True to append to existing log file, False to overwrite and create new log file</param>
-        private SimpleLogController(bool append = false)
+        private SimpleLogService(bool append = false)
         {
             datetimeFormat = "yyyy-MM-dd HH:mm:ss.fff";
             Filename = GetExecutingDirectory() + Assembly.GetExecutingAssembly().GetName().Name + "_" + GetCurrentDateString() + ".log";
