@@ -1,7 +1,9 @@
 ﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using NoiseBot.Controllers;
+using DSharpPlus.Entities;
+using NoiseBot.Services;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NoiseBot.Commands.VoiceCommands
@@ -35,8 +37,15 @@ namespace NoiseBot.Commands.VoiceCommands
                 return;
             }
 
-            int placeInQueue = AudioController.Instance.AddAudioToQueue(filename, vstat?.Channel, ctx.Guild);
-            await ctx.RespondAsync(string.Format("Added to the play queue: {0} in line", placeInQueue));
+            int placeInQueue = AudioService.Instance.AddAudioToQueue(filename, vstat?.Channel, ctx.Guild);
+
+            string message = placeInQueue == 0 ? $"Now playing!" : $"Added to the play queue: {placeInQueue} in line";
+
+            DiscordMessage sentMessage = await ctx.RespondAsync(message);
+            Thread.Sleep(5000);
+            await sentMessage.DeleteAsync();
+            await ctx.Message.DeleteAsync();
+
             return;
         }
     }
