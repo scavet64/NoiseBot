@@ -1,7 +1,9 @@
 ﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using DSharpPlus.EventArgs;
 using DSharpPlus.VoiceNext;
+using NoiseBot.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -18,31 +20,40 @@ namespace NoiseBot.Commands.VoiceCommands
             return Task.CompletedTask;
         }
 
-        private async Task Client_MessageCreatedAsync(DSharpPlus.EventArgs.MessageCreateEventArgs e)
+        private async Task Client_MessageCreatedAsync(MessageCreateEventArgs e)
         {
-            if (e.Message.Content.Contains(":foodReview:"))
-            {
-                VoiceNextExtension voiceNextClient = Program.Client.GetVoiceNext();
-                VoiceNextConnection voiceNextCon = voiceNextClient.GetConnection(e.Guild);
-                if (voiceNextCon == null)
+            await Task.Run(() => {
+                if (e.Message.Content.Contains(":foodReview:"))
                 {
-                    foreach (DiscordVoiceState vs in e.Guild.VoiceStates)
+                    ProcessEmoteSound(e, @"AudioFiles\foodReview.mp3");
+                }
+                if (e.Message.Content.Contains(":steventrue:"))
+                {
+                    ProcessEmoteSound(e, @"AudioFiles\true.mp3");
+                }
+            });
+        }
+
+        private void ProcessEmoteSound(MessageCreateEventArgs messageCreateEvent, string path)
+        {
+            VoiceNextExtension voiceNextClient = Program.Client.GetVoiceNext();
+            VoiceNextConnection voiceNextCon = voiceNextClient.GetConnection(messageCreateEvent.Guild);
+            if (voiceNextCon == null)
+            {
+                foreach (DiscordVoiceState voiceState in messageCreateEvent.Guild.VoiceStates)
+                {
+                    // Check if the user is inside a voice channel. If not do nothing
+                    if (voiceState.User.Username.Equals(messageCreateEvent.Author.Username))
                     {
-                        if (vs.User.Username.Equals(e.Author.Username))
+                        if (voiceState.Channel != null)
                         {
-                            voiceNextCon = await voiceNextClient.ConnectAsync(vs.Channel);
+                            AudioService.Instance.AddAudioToQueue(path, voiceState.Channel, messageCreateEvent.Guild);
+                        }
+                        else
+                        {
+                            return;
                         }
                     }
-                }
-                if (voiceNextCon == null)
-                {
-                    // user wasnt in a voice channel
-                    return;
-                }
-                else
-                {
-                    // await PlayAudio(voiceNextCon, @"AudioFiles\foodReview.mp3");
-                    voiceNextCon.Disconnect();
                 }
             }
         }
