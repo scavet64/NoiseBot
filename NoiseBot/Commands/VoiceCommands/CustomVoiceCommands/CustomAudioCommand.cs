@@ -5,12 +5,16 @@ using NoiseBot.Commands.CommandUtil;
 using NoiseBot.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
 {
     class CustomAudioCommand : PlayAudioCommand
     {
+        private const int SpacesBetweenCommands = 10;
+        private const int MaxLength = 1900;
+
         [Command("."), Description("Plays a custom audio command.")]
         public async Task PlayCustom(CommandContext ctx, [RemainingText, Description("Name of the command")] string customCommandName)
         {
@@ -94,11 +98,14 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
         public async Task ListCustom(CommandContext ctx, [RemainingText, Description("Name of the command")] string customCommandName)
         {
             List<string> custCom = CustomAudioCommandFile.Instance.GetAllCustomCommandNames();
-            string content = string.Empty;
-            foreach (string name in custCom)
+
+            if (custCom.Count == 0)
             {
-                content += ConfigFile.Instance.CommandPrefix + ". " + name + "\n";
+                await ctx.RespondAsync("No custom commands :^(");
+                return;
             }
+
+            List<string> contentLists = GetCommandlistParts(custCom);
 
             var embed = new DiscordEmbedBuilder
             {
@@ -107,8 +114,16 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
                 Description = string.Format("To use a custom command use `{0}. ` followed by the desired command", ConfigFile.Instance.CommandPrefix)
             };
 
-            embed.AddField($"{custCom.Count} Custom Commands:", content);
-            await ctx.RespondAsync(embed: embed);
+            //embed.AddField($"{custCom.Count} Custom Commands:", contentLists[0]);
+
+            await ctx.RespondAsync($"```{contentLists[0]}```");
+            for (int i = 1; i < contentLists.Count; i++)
+            {
+                await ctx.RespondAsync($"```{contentLists[i]}```");
+                //embed.AddField($"Continued:", contentLists[i]);
+            }
+
+            //await ctx.RespondAsync(embed: embed);
         }
 
         [Command("Random"), Description("Plays a random command")]
@@ -119,6 +134,58 @@ namespace NoiseBot.Commands.VoiceCommands.CustomVoiceCommands
             string command = custCom[new Random().Next(custCom.Count)];
 
             await PlayCustom(ctx, command);
+        }
+
+        private List<string> GetCommandlistParts(List<string> custCom)
+        {
+            List<string> returnList = new List<string>();
+            int longestCommand = FindLongestCommandLength(custCom);
+
+            StringBuilder builder = new StringBuilder();
+            for(int i = 0; i < custCom.Count; i++)
+            {
+                string prepend = ConfigFile.Instance.CommandPrefix + ". " + custCom[i] + (i % 2 == 1 ? "\n" : GetSpacesToAdd(custCom[i], longestCommand));
+                if (builder.Length + prepend.Length < MaxLength)
+                {
+                    builder.Append(prepend);
+                }
+                else
+                {
+                    returnList.Add(builder.ToString());
+                    builder.Clear();
+                }
+            }
+            returnList.Add(builder.ToString());
+
+            return returnList;
+        }
+
+        private string GetSpacesToAdd(string command, int longest)
+        {
+            // Find the difference between the command name and the longest
+            int temp = longest - command.Length;
+            int spacesToAdd = temp + SpacesBetweenCommands;
+
+            StringBuilder builder = new StringBuilder();
+            for(int i = 0; i < spacesToAdd; i++)
+            {
+                builder.Append(" ");
+            }
+            return builder.ToString();
+        }
+
+        private int FindLongestCommandLength(List<string> custCom)
+        {
+            int longest = 0;
+            for (int i = 0; i < custCom.Count; i++)
+            {
+                if (custCom[i].Length > longest)
+                {
+                    longest = custCom[i].Length;
+                }
+            }
+
+            return longest;
         }
     }
 }
