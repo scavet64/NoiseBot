@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -73,6 +73,12 @@ namespace NoiseBot.Commands.VoiceCommands.GameBotCommands
         [Command("Vote"), Description("Starts a game vote.")]
         public async Task Vote(CommandContext ctx, [RemainingText, Description("number of voters")] int number)
         {
+            if (number < 1)
+            {
+                await ctx.RespondAsync("You can't do that :^(");
+                return;
+            }
+
             var games = GameListFile.Instance.GetAllGames();
             var gameToVotes = new Dictionary<string, int>(games.Count);
 
