@@ -91,7 +91,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
             }
             catch (Exception ex)
             {
-                e.Client.DebugLogger.LogMessage(LogLevel.Critical, "ExampleBot", string.Format("{0}", ex), DateTime.Now);
+                e.Client.DebugLogger.LogMessage(LogLevel.Critical, "NoiseBot", string.Format("{0}", ex), DateTime.Now);
             }
             return Task.CompletedTask;
         }
@@ -160,19 +160,7 @@ namespace NoiseBot.Commands.VoiceCommands.CustomIntroCommands
                 IntroQueueElement introQueueElement = outroQueue.Take();
                 if (_isDoingOutros)
                 {
-                    //CustomIntroModel introModel = CustomIntroFile.Instance.GetIntroForUsername(introQueueElement.NewUser.Username);
-                    string filepath = filepath = @"AudioFiles\disconnected.mp3";
-                    //if (introModel != null)
-                    //{
-                    //    Program.Client.DebugLogger.Info(string.Format("Playing {0} for {1}", introModel.Filepath, introQueueElement.NewUser.Username));
-                    //    filepath = introModel.Filepath;
-                    //}
-                    //else
-                    //{
-                    //    Program.Client.DebugLogger.Warn(string.Format("No intro was found for {0}. Using default", introQueueElement.NewUser.Username));
-                    //    filepath = @"AudioFiles\disconnected.mp3";
-                    //}
-
+                    string filepath = @"AudioFiles\disconnected.mp3";
                     AudioService.Instance.AddAudioToQueue(filepath, introQueueElement.ChannelToJoin, introQueueElement.GuildToJoin);
                 }
             }
