@@ -148,7 +148,7 @@ namespace NoiseBot
             var vcfg = new VoiceNextConfiguration
             {
                 AudioFormat = AudioFormat.Default,
-                EnableIncoming = false
+                EnableIncoming = true
             };
 
             // and let's enable it
