@@ -7,7 +7,6 @@ using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
 using DSharpPlus.VoiceNext;
-using DSharpPlus.VoiceNext.Codec;
 using NoiseBot.Commands.VoiceCommands;
 using NoiseBot.Commands.VoiceCommands.CustomIntroCommands;
 using NoiseBot.Commands.VoiceCommands.CustomVoiceCommands;
@@ -15,7 +14,6 @@ using NoiseBot.Commands.VoiceCommands.GameBotCommands;
 using NoiseBot.Commands.VoiceCommands.VoiceRecognition;
 using NoiseBot.Exceptions;
 using NoiseBot.Extensions;
-using NoiseBot.Commands;
 using NoiseBot.Commands.RedditCommands;
 using NoiseBot.Services;
 
@@ -80,30 +78,7 @@ namespace NoiseBot
                 return;
             }
 
-            // If you are on Windows 7 and using .NETFX, install 
-            // DSharpPlus.WebSocket.WebSocket4Net from NuGet,
-            // add appropriate usings, and uncomment the following
-            // line
-            // this.Client.SetWebSocketClient<WebSocket4NetClient>();
-
-            // If you are on Windows 7 and using .NET Core, install 
-            // DSharpPlus.WebSocket.WebSocket4NetCore from NuGet,
-            // add appropriate usings, and uncomment the following
-            // line
-            // this.Client.SetWebSocketClient<WebSocket4NetCoreClient>();
-
-            // If you are using Mono, install 
-            // DSharpPlus.WebSocket.WebSocketSharp from NuGet,
-            // add appropriate usings, and uncomment the following
-            // line
-            // this.Client.SetWebSocketClient<WebSocketSharpClient>();
-
-            // if using any alternate socket client implementations, 
-            // remember to add the following to the top of this file:
-            // using DSharpPlus.Net.WebSocket;
-
-            // next, let's hook some events, so we know
-            // what's going on
+            // next, let's hook some events, so we know what's going on
             Client.Ready += this.Client_Ready;
             Client.GuildAvailable += this.Client_GuildAvailable;
             Client.ClientErrored += this.Client_ClientError;
@@ -126,9 +101,6 @@ namespace NoiseBot
 
             // and hook them up
             this.Commands = Client.UseCommandsNext(ccfg);
-
-            // let's hook some command events, so we know what's 
-            // going on
             this.Commands.CommandExecuted += this.Commands_CommandExecuted;
             this.Commands.CommandErrored += this.Commands_CommandErrored;
 
@@ -148,7 +120,7 @@ namespace NoiseBot
             var vcfg = new VoiceNextConfiguration
             {
                 AudioFormat = AudioFormat.Default,
-                EnableIncoming = true
+                EnableIncoming = configFile.EnableIncoming
             };
 
             // and let's enable it
@@ -157,9 +129,7 @@ namespace NoiseBot
             // finally, let's connect and log in
             await Client.ConnectAsync();
 
-            // for this example you will need to read the 
-            // VoiceNext setup guide, and include ffmpeg.
-
+            // Start up the reddit subscription thread
             RedditService.StartSubscriptionThreadsThread();
 
             // and this is to prevent premature quitting
@@ -190,13 +160,6 @@ namespace NoiseBot
             {
                 Client.DebugLogger.Info(string.Format("{0} is now offline", e.User.Username));
             }
-
-            return Task.CompletedTask;
-        }
-
-        private Task Client_TypingStarted(TypingStartEventArgs e)
-        {
-            e.Channel.SendMessageAsync(":^)");
 
             return Task.CompletedTask;
         }

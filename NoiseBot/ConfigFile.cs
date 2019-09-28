@@ -34,6 +34,9 @@ namespace NoiseBot
         [JsonProperty("prefix")]
         public string CommandPrefix { get; private set; }
 
+        [JsonProperty("enableIncoming")]
+        public bool EnableIncoming { get; private set; } = false;
+
         private ConfigFile() { }
 
         private static ConfigFile LoadConfigFromFile(string filePath)
