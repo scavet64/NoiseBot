@@ -98,15 +98,16 @@ namespace NoiseBot.Services
             {
                 Name = subscription.Subreddit + " - SubscriptionThread"
             };
-            t.Start();
             subscriptionToIsRunning.Add(subscription, true);
+            t.Start();
             return t;
         }
 
         private static void SubscriptionThreadMethod(RedditSubscriptionModel subscription)
         {
             // Get the boolean that maps to this subscription. If not found false is returned by default and the loop will end
-            while (subscriptionToIsRunning.GetValueOrDefault(subscription, false))
+
+            while (subscriptionToIsRunning[subscription])
             {
                 PostFromRedditAsync(subscription).Wait();
                 Thread.Sleep(new TimeSpan(0, subscription.IntervalMin, 0));

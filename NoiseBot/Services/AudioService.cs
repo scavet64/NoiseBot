@@ -102,7 +102,7 @@ namespace NoiseBot.Services
                         Program.Client.DebugLogger.Info($"Not currently connected");
                         Task<VoiceNextConnection> voiceNextConTask = voiceNextClient.ConnectAsync(elementToPlay.ChannelToJoin);
                         voiceNextConTask.Wait(new TimeSpan(0, 0, 3));
-                        if(voiceNextConTask.IsCompletedSuccessfully)
+                        if(voiceNextConTask.IsCompleted)
                         {
                             voiceNextCon = voiceNextConTask.Result;
                             Program.Client.DebugLogger.Info($"Joined: {voiceNextCon.Channel}");
@@ -145,7 +145,7 @@ namespace NoiseBot.Services
             }
 
             // play
-            await voiceNextCon.SendSpeakingAsync(true);
+            voiceNextCon.SendSpeaking(true);
             try
             {
                 var ffmpeg_inf = new ProcessStartInfo
@@ -160,26 +160,11 @@ namespace NoiseBot.Services
                 var ffmpeg = Process.Start(ffmpeg_inf);
                 var ffout = ffmpeg.StandardOutput.BaseStream;
 
-                // let's buffer ffmpeg output
-                using (var ms = new MemoryStream())
-                {
-                    await ffout.CopyToAsync(ms);
-                    ms.Position = 0;
+                var transmitStream = voiceNextCon.GetTransmitStream();
+                await ffout.CopyToAsync(transmitStream).ConfigureAwait(false);
+                await transmitStream.FlushAsync().ConfigureAwait(false);
 
-                    var buff = new byte[3840]; // buffer to hold the PCM data
-                    var br = 0;
-                    while ((br = ms.Read(buff, 0, buff.Length)) > 0)
-                    {
-                        if (br < buff.Length) // it's possible we got less than expected, let's null the remaining part of the buffer
-                        {
-                            for (var i = br; i < buff.Length; i++)
-                            {
-                                buff[i] = 0;
-                            }
-                        }
-                        await voiceNextCon.SendAsync(buff, 20); // we're sending 20ms of data
-                    }
-                }
+                await voiceNextCon.WaitForPlaybackFinishAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -188,7 +173,7 @@ namespace NoiseBot.Services
             }
             finally
             {
-                await voiceNextCon.SendSpeakingAsync(false);
+                voiceNextCon.SendSpeaking(false);
                 Program.Client.DebugLogger.Info($"Finished playing audio");
             }
         }

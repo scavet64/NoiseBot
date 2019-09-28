@@ -145,10 +145,10 @@ namespace NoiseBot.Commands.VoiceCommands.GameBotCommands
                     }
                 });
 
-                if (message.Message.Content.ToLower() == "stop") return -1;
+                if (message.Result.Content.ToLower() == "stop") return -1;
 
-                users.Add(message.User.Username);
-                votes.Add(int.Parse(message.Message.Content));
+                users.Add(message.Result.Author.Username);
+                votes.Add(int.Parse(message.Result.Content));
             }
 
             return votes.Contains(0) ? 0 : votes.Sum();

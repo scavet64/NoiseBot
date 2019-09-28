@@ -22,7 +22,8 @@ namespace NoiseBot.Commands.VoiceCommands
 
         private async Task Client_MessageCreatedAsync(MessageCreateEventArgs e)
         {
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 if (e.Message.Content.Contains(":foodReview:"))
                 {
                     ProcessEmoteSound(e, @"AudioFiles\foodReview.mp3");
@@ -40,21 +41,8 @@ namespace NoiseBot.Commands.VoiceCommands
             VoiceNextConnection voiceNextCon = voiceNextClient.GetConnection(messageCreateEvent.Guild);
             if (voiceNextCon == null)
             {
-                foreach (DiscordVoiceState voiceState in messageCreateEvent.Guild.VoiceStates)
-                {
-                    // Check if the user is inside a voice channel. If not do nothing
-                    if (voiceState.User.Username.Equals(messageCreateEvent.Author.Username))
-                    {
-                        if (voiceState.Channel != null)
-                        {
-                            AudioService.Instance.AddAudioToQueue(path, voiceState.Channel, messageCreateEvent.Guild);
-                        }
-                        else
-                        {
-                            return;
-                        }
-                    }
-                }
+                DiscordChannel channel = messageCreateEvent.Guild.VoiceStates[messageCreateEvent.Author.Id].Channel;
+                AudioService.Instance.AddAudioToQueue(path, channel, messageCreateEvent.Guild);
             }
         }
     }

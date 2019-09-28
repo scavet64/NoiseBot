@@ -1,33 +1,299 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D5946844-12E0-40A4-B8D5-A0BA47201C40}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
-    <ApplicationIcon />
-    <StartupObject></StartupObject>
+    <RootNamespace>NoiseBot</RootNamespace>
+    <AssemblyName>NoiseBot</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
-
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="4.0.0-beta-00467" />
-    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-beta-00467" />
-    <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-beta-00467" />
-    <PackageReference Include="DSharpPlus.VoiceNext" Version="4.0.0-beta-00467" />
-    <PackageReference Include="RedditSharp" Version="1.1.14" />
+    <Reference Include="DSharpPlus, Version=4.0.0.625, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DSharpPlus.4.0.0-nightly-00625\lib\net45\DSharpPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="DSharpPlus.CommandsNext, Version=4.0.0.625, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DSharpPlus.CommandsNext.4.0.0-nightly-00625\lib\net45\DSharpPlus.CommandsNext.dll</HintPath>
+    </Reference>
+    <Reference Include="DSharpPlus.Interactivity, Version=4.0.0.625, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DSharpPlus.Interactivity.4.0.0-nightly-00625\lib\net45\DSharpPlus.Interactivity.dll</HintPath>
+    </Reference>
+    <Reference Include="DSharpPlus.VoiceNext, Version=4.0.0.625, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DSharpPlus.VoiceNext.4.0.0-nightly-00625\lib\net45\DSharpPlus.VoiceNext.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Emzi0767.Microsoft.DependencyInjection.2.0.0\lib\net47\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Emzi0767.Microsoft.DependencyInjection.Abstractions.2.0.0\lib\net47\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio, Version=1.9.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.1.9.0\lib\net35\NAudio.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NWaves, Version=0.9.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NWaves.0.9.3\lib\netstandard2.0\NWaves.dll</HintPath>
+    </Reference>
+    <Reference Include="RedditSharp, Version=1.1.14.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RedditSharp.1.1.14\lib\net461\RedditSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Memory, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.2\lib\netstandard2.0\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.4.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.2\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Speech" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
-
   <ItemGroup>
-    <None Update="config.json">
+    <Compile Include="Commands\CommandUtil\FileDownloadUtil.cs" />
+    <Compile Include="Commands\RedditCommands\PersonalRedditNotification.cs" />
+    <Compile Include="Commands\RedditCommands\RedditCommands.cs" />
+    <Compile Include="Commands\RedditCommands\RedditSubscriptionModel.cs" />
+    <Compile Include="Commands\RedditCommands\RedditSubscriptionsFile.cs" />
+    <Compile Include="Commands\TextCommands\GameBotCommands\GameListCommand.cs" />
+    <Compile Include="Commands\TextCommands\GameBotCommands\GameListFile.cs" />
+    <Compile Include="Commands\TextCommands\GameBotCommands\GameListModel.cs" />
+    <Compile Include="Commands\VoiceCommands\CustomIntroCommands\CustomIntroCommand.cs" />
+    <Compile Include="Commands\VoiceCommands\CustomIntroCommands\CustomIntroFile.cs" />
+    <Compile Include="Commands\VoiceCommands\CustomIntroCommands\CustomIntroModel.cs" />
+    <Compile Include="Commands\VoiceCommands\CustomVoiceCommands\CustomAudioCommand.cs" />
+    <Compile Include="Commands\VoiceCommands\CustomVoiceCommands\CustomAudioCommandFile.cs" />
+    <Compile Include="Commands\VoiceCommands\CustomVoiceCommands\CustomAudioCommandModel.cs" />
+    <Compile Include="Commands\VoiceCommands\EmoteCommands.cs" />
+    <Compile Include="Commands\VoiceCommands\PlayAudioCommand.cs" />
+    <Compile Include="Commands\VoiceCommands\VoiceCommand.cs" />
+    <Compile Include="Commands\VoiceCommands\VoiceRecognition\VoiceRecognition.cs" />
+    <Compile Include="ConfigFile.cs" />
+    <Compile Include="Exceptions\InvalidConfigException.cs" />
+    <Compile Include="Exceptions\InvalidCustomCommandFileException.cs" />
+    <Compile Include="Extensions\AudioExtensions.cs" />
+    <Compile Include="Extensions\LoggingExtensions.cs" />
+    <Compile Include="HelpFormatter.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\AudioConverterService.cs" />
+    <Compile Include="Services\AudioService.cs" />
+    <Compile Include="Services\RedditService.cs" />
+    <Compile Include="Services\SerializationService.cs" />
+    <Compile Include="Services\SimpleLogService.cs" />
+    <Compile Include="Services\SpeechEngine.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="ffmpeg.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="libopus.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="libsodium.dll">
+    <None Include="CustomAudioCommands.json" />
+    <None Include="CustomIntros.json" />
+    <None Include="packages.config" />
+    <None Include="RedditSubscriptions.json" />
+    <None Include="Settings.StyleCop" />
+    <None Include="StyleCop.Cache" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\22.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\ayeokay.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\bestoutro.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\Bill_Nye.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\Crimson_Chin_Theme.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\D.Va_-_Are_you_sure_life_isnt_a_game_Soldier_76.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\disconnected.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\dododo.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\Ducktales_-_Niggerz_Uncensored.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\eyespider.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\Fart_Sound_Effect.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\foodReview.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\fuckyou.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\GET_THE_FUCK_OUT_OF_HERE_Sound_Effect.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\gogogo.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\Gold.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\gonnablow.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\hehe.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\help.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\Hey_daddyo.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\hi.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\Is_this_Nig_Mode.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\Is_this_Nig_Mode222.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\jail.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\KillN.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\kys.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\LOUD_BLACK_GUY_ORGASM_-_with_Subtitles.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\MadWorld.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\Man_screaming_sound_effect_1.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\Moment.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\nobodylook.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\Oh_Brother_this_guy_stinks.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\Opponent.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\Popped_A_Molly.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\SiegHeil.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\sorryforwut.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\Were_Freeeee.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\woop_woop.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\worms.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\Yee.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\zGlockjaw.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\zknock_him_out.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\zMaking_my_way_downtown.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioFiles\zWelcome_to_the_Cash_Cab.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ffmpeg.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
+  <ItemGroup>
+    <None Include="libopus.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="libsodium.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="sodium.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="opus.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

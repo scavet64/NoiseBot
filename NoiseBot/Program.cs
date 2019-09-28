@@ -147,7 +147,7 @@ namespace NoiseBot
             // let's set up voice
             var vcfg = new VoiceNextConfiguration
             {
-                VoiceApplication = VoiceApplication.Music,
+                AudioFormat = AudioFormat.Default,
                 EnableIncoming = false
             };
 

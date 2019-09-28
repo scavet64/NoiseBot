@@ -47,7 +47,7 @@ namespace NoiseBot.Commands.VoiceCommands
                 var vnc = await context.Client.GetVoiceNext().ConnectAsync(chn);
                 context.Client.DebugLogger.Info($"Connected to `{chn.Name}`");
             }
-            catch (DllNotFoundException)
+            catch (DllNotFoundException ex)
             {
                 context.Client.DebugLogger.LogMessage(LogLevel.Critical, "NoiseBot", "Missing Required DLL for Voice Chat", DateTime.Now);
                 await context.RespondAsync("Missing dependant files. Contact your bot manager");
